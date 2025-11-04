@@ -148,6 +148,37 @@ const DiscoveryPage = () => {
         </div>
       </div>
 
+      {/* Action buttons below cards */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center gap-4 px-8">
+        <button
+          onClick={() => handleSwipe('pass')}
+          className="w-14 h-14 rounded-full bg-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 border border-gray-200"
+        >
+          <X className="w-7 h-7 text-red-500" strokeWidth={2.5} />
+        </button>
+
+        <button
+          onClick={handleShowProfile}
+          className="w-12 h-12 rounded-full bg-white shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 border border-gray-200"
+        >
+          <Info className="w-5 h-5 text-blue-500" />
+        </button>
+
+        <button
+          onClick={() => handleSwipe('super_like')}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+        >
+          <Star className="w-7 h-7 text-white" fill="white" strokeWidth={2} />
+        </button>
+
+        <button
+          onClick={() => handleSwipe('like')}
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-red-500 shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+        >
+          <Heart className="w-8 h-8 text-white" fill="white" strokeWidth={2} />
+        </button>
+      </div>
+
       {/* Match Modal */}
       {showMatch && matchedUser && (
         <>
