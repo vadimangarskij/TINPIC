@@ -1,1207 +1,918 @@
-diff --git a/frontend/src/pages/SettingsPage.jsx b/frontend/src/pages/SettingsPage.jsx
-index 14f22b2..71d7846 100644
---- a/frontend/src/pages/SettingsPage.jsx
-+++ b/frontend/src/pages/SettingsPage.jsx
-@@ -1,17 +1,116 @@
-+import { useState } from 'react';
- import { useNavigate } from 'react-router-dom';
--import { ArrowLeft } from 'lucide-react';
-+import { ArrowLeft, Bell, Shield, CreditCard, LogOut, User, Lock, HelpCircle, Info } from 'lucide-react';
-+import { useAuthStore } from '../stores/authStore';
-+import toast from 'react-hot-toast';
- 
- const SettingsPage = () => {
-   const navigate = useNavigate();
-+  const { user, logout } = useAuthStore();
-+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-+
-+  const handleLogout = () => {
-+    logout();
-+    toast.success('Вы вышли из аккаунта');
-+    navigate('/welcome');
-+  };
-+
-+  const settings = [
-+    { icon: User, label: 'Редактировать профиль', path: '/profile', color: 'text-blue-500' },
-+    { icon: Bell, label: 'Уведомления', path: '/settings/notifications', color: 'text-purple-500' },
-+    { icon: Shield, label: 'Приватность и безопасность', path: '/settings/privacy', color: 'text-green-500' },
-+    { icon: CreditCard, label: 'Подписка и платежи', path: '/premium', color: 'text-orange-500' },
-+    { icon: Lock, label: 'Изменить пароль', path: '/settings/password', color: 'text-red-500' },
-+    { icon: HelpCircle, label: 'Помощь и поддержка', path: '/settings/help', color: 'text-cyan-500' },
-+    { icon: Info, label: 'О приложении', path: '/settings/about', color: 'text-gray-500' },
-+  ];
- 
-   return (
--    <div className="h-full bg-white">
--      <div className="p-6 border-b">
--        <button onClick={() => navigate(-1)}>
--          <ArrowLeft className="w-6 h-6" />
-+    <div className="h-full flex flex-col bg-gray-50">
-+      {/* Header */}
-+      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
-+        <button
-+          onClick={() => navigate(-1)}
-+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-+        >
-+          <ArrowLeft className="w-6 h-6 text-gray-700" />
-         </button>
--        <h1 className="text-2xl font-bold mt-4">Настройки</h1>
-+        <h1 className="text-xl font-bold text-gray-800">Настройки</h1>
-       </div>
-+
-+      {/* User Info */}
-+      <div className="bg-white p-6 mb-2">
-+        <div className="flex items-center gap-4">
-+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white text-2xl font-bold">
-+            {user?.full_name?.[0] || 'U'}
-+          </div>
-+          <div>
-+            <h2 className="text-lg font-bold text-gray-800">{user?.full_name || 'Пользователь'}</h2>
-+            <p className="text-sm text-gray-600">{user?.email}</p>
-+          </div>
-+        </div>
-+      </div>
-+
-+      {/* Settings List */}
-+      <div className="flex-1 overflow-y-auto">
-+        <div className="bg-white">
-+          {settings.map((setting, idx) => (
-+            <button
-+              key={idx}
-+              onClick={() => navigate(setting.path)}
-+              className="w-full flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
-+            >
-+              <div className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center ${setting.color}`}>
-+                <setting.icon className="w-5 h-5" />
-+              </div>
-+              <span className="flex-1 text-left font-medium text-gray-800">{setting.label}</span>
-+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-+              </svg>
-+            </button>
-+          ))}
-+        </div>
-+
-+        {/* Logout Button */}
-+        <div className="p-6">
-+          <button
-+            onClick={() => setShowLogoutConfirm(true)}
-+            className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 font-semibold py-4 rounded-2xl hover:bg-red-100 transition-colors"
-+          >
-+            <LogOut className="w-5 h-5" />
-+            Выйти из аккаунта
-+          </button>
-+        </div>
-+
-+        {/* Version */}
-+        <div className="text-center text-sm text-gray-400 pb-6">
-+          ConnectSphere v2.0.0
-+        </div>
-+      </div>
-+
-+      {/* Logout Confirmation Modal */}
-+      {showLogoutConfirm && (
-+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
-+            <h3 className="text-xl font-bold text-gray-800 mb-2">Выйти из аккаунта?</h3>
-+            <p className="text-gray-600 mb-6">Вы уверены, что хотите выйти?</p>
-+            <div className="flex gap-3">
-+              <button
-+                onClick={() => setShowLogoutConfirm(false)}
-+                className="flex-1 py-3 bg-gray-100 text-gray-800 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
-+              >
-+                Отмена
-+              </button>
-+              <button
-+                onClick={handleLogout}
-+                className="flex-1 py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors"
-+              >
-+                Выйти
-+              </button>
-+            </div>
-+          </div>
-+        </div>
-+      )}
-     </div>
-   );
- };
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+index 0e5e18c..895a2ac 100644
+--- a/frontend/src/App.jsx
++++ b/frontend/src/App.jsx
+@@ -111,6 +111,7 @@ function App() {
+                   </AuthLayout>
+                 }
+               />
++              <Route path="/features" element={<FeaturesPage />} />
+               <Route path="*" element={<Navigate to="/welcome" replace />} />
+             </>
+           ) : (
 diff --git a/model.patch b/model.patch
-index 530a5ae..68090f0 100644
+index ee739a7..e69de29 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,1182 +0,0 @@
--diff --git a/frontend/src/pages/HomePage.jsx b/frontend/src/pages/HomePage.jsx
--index 11060e3..72ec255 100644
----- a/frontend/src/pages/HomePage.jsx
--+++ b/frontend/src/pages/HomePage.jsx
--@@ -1,42 +1,164 @@
--+import { useEffect, useState } from 'react';
+@@ -1,1314 +0,0 @@
+-diff --git a/frontend/src/pages/SettingsPage.jsx b/frontend/src/pages/SettingsPage.jsx
+-index 14f22b2..71d7846 100644
+---- a/frontend/src/pages/SettingsPage.jsx
+-+++ b/frontend/src/pages/SettingsPage.jsx
+-@@ -1,17 +1,116 @@
+-+import { useState } from 'react';
 - import { useNavigate } from 'react-router-dom';
---import { motion } from 'framer-motion';
---import { Heart, MapPin, Crown } from 'lucide-react';
--+import { Heart, MessageCircle, Sparkles, TrendingUp, User, Star, Eye, Zap } from 'lucide-react';
+--import { ArrowLeft } from 'lucide-react';
+-+import { ArrowLeft, Bell, Shield, CreditCard, LogOut, User, Lock, HelpCircle, Info } from 'lucide-react';
 -+import { useAuthStore } from '../stores/authStore';
--+import { useUserStore } from '../stores/userStore';
+-+import toast from 'react-hot-toast';
 - 
-- const HomePage = () => {
+- const SettingsPage = () => {
 -   const navigate = useNavigate();
--+  const { user } = useAuthStore();
--+  const { matches, loadMatches, receivedLikes, loadReceivedLikes } = useUserStore();
--+  const [greeting, setGreeting] = useState('');
+-+  const { user, logout } = useAuthStore();
+-+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 -+
--+  useEffect(() => {
--+    // Set greeting based on time
--+    const hour = new Date().getHours();
--+    if (hour < 12) setGreeting('Доброе утро');
--+    else if (hour < 18) setGreeting('Добрый день');
--+    else setGreeting('Добрый вечер');
+-+  const handleLogout = () => {
+-+    logout();
+-+    toast.success('Вы вышли из аккаунта');
+-+    navigate('/welcome');
+-+  };
 -+
--+    // Load data
--+    loadMatches();
--+    loadReceivedLikes();
--+  }, []);
--+
--+  const stats = [
--+    { icon: Eye, label: 'Просмотры', value: user?.profile_views || 0, color: 'text-blue-500', bg: 'bg-blue-50' },
--+    { icon: Heart, label: 'Лайки', value: user?.total_likes_received || 0, color: 'text-pink-500', bg: 'bg-pink-50' },
--+    { icon: Star, label: 'Super Likes', value: user?.total_super_likes_received || 0, color: 'text-purple-500', bg: 'bg-purple-50' },
--+    { icon: MessageCircle, label: 'Матчи', value: matches.length, color: 'text-green-500', bg: 'bg-green-50' },
--+  ];
--+
--+  const quickActions = [
--+    { 
--+      icon: Zap, 
--+      label: 'Начать поиск', 
--+      subtitle: 'Найди свою пару',
--+      path: '/discovery', 
--+      gradient: 'from-pink-500 to-red-500' 
--+    },
--+    { 
--+      icon: MessageCircle, 
--+      label: 'Сообщения', 
--+      subtitle: `${matches.length} совпадений`,
--+      path: '/matches', 
--+      gradient: 'from-purple-500 to-pink-500',
--+      badge: matches.filter(m => m.unread_count > 0).length 
--+    },
--+    { 
--+      icon: User, 
--+      label: 'Мой профиль', 
--+      subtitle: 'Редактировать',
--+      path: '/profile', 
--+      gradient: 'from-blue-500 to-cyan-500' 
--+    },
--+    { 
--+      icon: Sparkles, 
--+      label: 'Premium', 
--+      subtitle: 'Больше возможностей',
--+      path: '/premium', 
--+      gradient: 'from-yellow-500 to-orange-500',
--+      premium: true
--+    },
+-+  const settings = [
+-+    { icon: User, label: 'Редактировать профиль', path: '/profile', color: 'text-blue-500' },
+-+    { icon: Bell, label: 'Уведомления', path: '/settings/notifications', color: 'text-purple-500' },
+-+    { icon: Shield, label: 'Приватность и безопасность', path: '/settings/privacy', color: 'text-green-500' },
+-+    { icon: CreditCard, label: 'Подписка и платежи', path: '/premium', color: 'text-orange-500' },
+-+    { icon: Lock, label: 'Изменить пароль', path: '/settings/password', color: 'text-red-500' },
+-+    { icon: HelpCircle, label: 'Помощь и поддержка', path: '/settings/help', color: 'text-cyan-500' },
+-+    { icon: Info, label: 'О приложении', path: '/settings/about', color: 'text-gray-500' },
 -+  ];
 - 
 -   return (
---    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-red-50 p-6">
---      <h1 className="text-3xl font-bold mb-6">Главная</h1>
---      
---      <div className="space-y-4">
---        <motion.button
---          whileTap={{ scale: 0.95 }}
---          onClick={() => navigate('/discovery')}
---          className="w-full p-6 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-3xl shadow-xl"
---        >
---          <Heart className="w-8 h-8 mx-auto mb-2" />
---          <div className="font-bold text-lg">Начать знакомства</div>
---        </motion.button>
---
---        <motion.button
---          whileTap={{ scale: 0.95 }}
---          onClick={() => navigate('/places')}
---          className="w-full p-6 bg-white rounded-3xl shadow-xl"
---        >
---          <MapPin className="w-8 h-8 mx-auto mb-2 text-blue-500" />
---          <div className="font-bold text-lg">Куда сходить</div>
---        </motion.button>
---
---        <motion.button
---          whileTap={{ scale: 0.95 }}
---          onClick={() => navigate('/premium')}
---          className="w-full p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-3xl shadow-xl"
---        >
---          <Crown className="w-8 h-8 mx-auto mb-2" />
---          <div className="font-bold text-lg">Premium</div>
---        </motion.button>
--+    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+--    <div className="h-full bg-white">
+--      <div className="p-6 border-b">
+--        <button onClick={() => navigate(-1)}>
+--          <ArrowLeft className="w-6 h-6" />
+-+    <div className="h-full flex flex-col bg-gray-50">
 -+      {/* Header */}
--+      <div className="p-6 pb-0">
--+        <div className="mb-6">
--+          <h1 className="text-3xl font-bold text-gray-800 mb-1">
--+            {greeting}, {user?.full_name?.split(' ')[0] || 'друг'}! 👋
--+          </h1>
--+          <p className="text-gray-600">Готовы найти свою любовь сегодня?</p>
--+        </div>
--+
--+        {/* Stats Grid */}
--+        <div className="grid grid-cols-4 gap-2 mb-6">
--+          {stats.map((stat, idx) => (
--+            <div
--+              key={idx}
--+              className={`${stat.bg} rounded-2xl p-3 text-center`}
--+            >
--+              <stat.icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
--+              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
--+              <p className="text-xs text-gray-600 truncate">{stat.label}</p>
--+            </div>
--+          ))}
--+        </div>
+-+      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+-+        <button
+-+          onClick={() => navigate(-1)}
+-+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+-+        >
+-+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+-         </button>
+--        <h1 className="text-2xl font-bold mt-4">Настройки</h1>
+-+        <h1 className="text-xl font-bold text-gray-800">Настройки</h1>
 -       </div>
 -+
--+      {/* Quick Actions */}
--+      <div className="px-6">
--+        <h2 className="text-lg font-bold text-gray-800 mb-4">Быстрые действия</h2>
--+        <div className="grid grid-cols-2 gap-4 mb-6">
--+          {quickActions.map((action, index) => (
--+            <button
--+              key={index}
--+              onClick={() => navigate(action.path)}
--+              className="relative group"
--+            >
--+              <div className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 text-white shadow-lg hover:shadow-xl transition-all group-hover:scale-[1.02] active:scale-[0.98]`}>
--+                {action.badge > 0 && (
--+                  <div className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
--+                    <span className="text-xs font-bold">{action.badge}</span>
--+                  </div>
--+                )}
--+                {action.premium && (
--+                  <div className="absolute top-2 right-2">
--+                    <div className="bg-yellow-400 rounded-full p-1">
--+                      <Sparkles className="w-3 h-3 text-white" fill="white" />
--+                    </div>
--+                  </div>
--+                )}
--+                <action.icon className="w-10 h-10 mb-3" strokeWidth={2} />
--+                <p className="font-bold text-base mb-0.5">{action.label}</p>
--+                <p className="text-xs text-white/80">{action.subtitle}</p>
--+              </div>
--+            </button>
--+          ))}
+-+      {/* User Info */}
+-+      <div className="bg-white p-6 mb-2">
+-+        <div className="flex items-center gap-4">
+-+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white text-2xl font-bold">
+-+            {user?.full_name?.[0] || 'U'}
+-+          </div>
+-+          <div>
+-+            <h2 className="text-lg font-bold text-gray-800">{user?.full_name || 'Пользователь'}</h2>
+-+            <p className="text-sm text-gray-600">{user?.email}</p>
+-+          </div>
 -+        </div>
 -+      </div>
 -+
--+      {/* Received Likes Preview */}
--+      {receivedLikes?.count > 0 && (
--+        <div className="px-6 mb-6">
--+          <div 
--+            onClick={() => navigate('/matches')}
--+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-6 text-white cursor-pointer hover:shadow-xl transition-all"
--+          >
--+            <div className="flex items-center justify-between mb-2">
--+              <div>
--+                <h3 className="text-xl font-bold mb-1">
--+                  {receivedLikes.count} {receivedLikes.count === 1 ? 'человек' : 'людей'} лайкнул вас!
--+                </h3>
--+                <p className="text-white/90 text-sm">
--+                  {receivedLikes.premium_required 
--+                    ? 'Обновитесь до Premium, чтобы увидеть'
--+                    : 'Посмотрите, кто вас лайкнул'
--+                  }
--+                </p>
+-+      {/* Settings List */}
+-+      <div className="flex-1 overflow-y-auto">
+-+        <div className="bg-white">
+-+          {settings.map((setting, idx) => (
+-+            <button
+-+              key={idx}
+-+              onClick={() => navigate(setting.path)}
+-+              className="w-full flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+-+            >
+-+              <div className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center ${setting.color}`}>
+-+                <setting.icon className="w-5 h-5" />
 -+              </div>
--+              <Star className="w-12 h-12" fill="white" />
+-+              <span className="flex-1 text-left font-medium text-gray-800">{setting.label}</span>
+-+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+-+              </svg>
+-+            </button>
+-+          ))}
+-+        </div>
+-+
+-+        {/* Logout Button */}
+-+        <div className="p-6">
+-+          <button
+-+            onClick={() => setShowLogoutConfirm(true)}
+-+            className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 font-semibold py-4 rounded-2xl hover:bg-red-100 transition-colors"
+-+          >
+-+            <LogOut className="w-5 h-5" />
+-+            Выйти из аккаунта
+-+          </button>
+-+        </div>
+-+
+-+        {/* Version */}
+-+        <div className="text-center text-sm text-gray-400 pb-6">
+-+          ConnectSphere v2.0.0
+-+        </div>
+-+      </div>
+-+
+-+      {/* Logout Confirmation Modal */}
+-+      {showLogoutConfirm && (
+-+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+-+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full">
+-+            <h3 className="text-xl font-bold text-gray-800 mb-2">Выйти из аккаунта?</h3>
+-+            <p className="text-gray-600 mb-6">Вы уверены, что хотите выйти?</p>
+-+            <div className="flex gap-3">
+-+              <button
+-+                onClick={() => setShowLogoutConfirm(false)}
+-+                className="flex-1 py-3 bg-gray-100 text-gray-800 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+-+              >
+-+                Отмена
+-+              </button>
+-+              <button
+-+                onClick={handleLogout}
+-+                className="flex-1 py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors"
+-+              >
+-+                Выйти
+-+              </button>
 -+            </div>
 -+          </div>
 -+        </div>
 -+      )}
--+
--+      {/* Tips Section */}
--+      <div className="px-6 pb-8">
--+        <div className="bg-white rounded-3xl p-6 shadow-md">
--+          <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
--+            <Sparkles className="w-5 h-5 text-pink-500" />
--+            Совет дня
--+          </h3>
--+          <p className="text-gray-600 text-sm leading-relaxed">
--+            Добавьте больше фотографий в свой профиль! Анкеты с 3+ фото получают на 40% больше совпадений 📸
--+          </p>
--+        </div>
--+      </div>
--+
--+      <div className="h-20" /> {/* Bottom spacing for nav */}
 -     </div>
 -   );
 - };
 -diff --git a/model.patch b/model.patch
--index 60e425e..ecbecf3 100644
+-index 530a5ae..68090f0 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,976 +0,0 @@
---diff --git a/frontend/src/pages/PremiumPage.jsx b/frontend/src/pages/PremiumPage.jsx
---index 7cfcc24..a516451 100644
------ a/frontend/src/pages/PremiumPage.jsx
---+++ b/frontend/src/pages/PremiumPage.jsx
---@@ -1,24 +1,231 @@
---+import { useState } from 'react';
+-@@ -1,1182 +0,0 @@
+--diff --git a/frontend/src/pages/HomePage.jsx b/frontend/src/pages/HomePage.jsx
+--index 11060e3..72ec255 100644
+----- a/frontend/src/pages/HomePage.jsx
+--+++ b/frontend/src/pages/HomePage.jsx
+--@@ -1,42 +1,164 @@
+--+import { useEffect, useState } from 'react';
 -- import { useNavigate } from 'react-router-dom';
----import { ArrowLeft, Crown } from 'lucide-react';
---+import { Crown, Check, X as CloseIcon, Sparkles, Zap, Eye, RefreshCw, Star } from 'lucide-react';
---+import { premiumAPI } from '../utils/api';
---+import toast from 'react-hot-toast';
+---import { motion } from 'framer-motion';
+---import { Heart, MapPin, Crown } from 'lucide-react';
+--+import { Heart, MessageCircle, Sparkles, TrendingUp, User, Star, Eye, Zap } from 'lucide-react';
+--+import { useAuthStore } from '../stores/authStore';
+--+import { useUserStore } from '../stores/userStore';
 -- 
--- const PremiumPage = () => {
+-- const HomePage = () => {
 --   const navigate = useNavigate();
---+  const [selectedPlan, setSelectedPlan] = useState('monthly');
---+  const [isProcessing, setIsProcessing] = useState(false);
+--+  const { user } = useAuthStore();
+--+  const { matches, loadMatches, receivedLikes, loadReceivedLikes } = useUserStore();
+--+  const [greeting, setGreeting] = useState('');
 --+
---+  const features = [
---+    { icon: Zap, text: 'Безлимитные свайпы', premium: true },
---+    { icon: Star, text: 'Безлимитные Super Likes', premium: true },
---+    { icon: Eye, text: 'Смотрите, кто вас лайкнул', premium: true },
---+    { icon: RefreshCw, text: 'Отменяйте свайпы', premium: true },
---+    { icon: Crown, text: 'Профильный значок Premium', premium: true },
---+    { icon: Sparkles, text: 'Буст профиля 1x в месяц', premium: true },
---+    { icon: Check, text: 'Приоритет в показе', premium: true },
---+    { icon: Check, text: 'Режим невидимки', premium: true },
---+    { icon: Check, text: 'Продвинутые фильтры', premium: true },
---+    { icon: Check, text: 'Отключение рекламы', premium: true },
+--+  useEffect(() => {
+--+    // Set greeting based on time
+--+    const hour = new Date().getHours();
+--+    if (hour < 12) setGreeting('Доброе утро');
+--+    else if (hour < 18) setGreeting('Добрый день');
+--+    else setGreeting('Добрый вечер');
+--+
+--+    // Load data
+--+    loadMatches();
+--+    loadReceivedLikes();
+--+  }, []);
+--+
+--+  const stats = [
+--+    { icon: Eye, label: 'Просмотры', value: user?.profile_views || 0, color: 'text-blue-500', bg: 'bg-blue-50' },
+--+    { icon: Heart, label: 'Лайки', value: user?.total_likes_received || 0, color: 'text-pink-500', bg: 'bg-pink-50' },
+--+    { icon: Star, label: 'Super Likes', value: user?.total_super_likes_received || 0, color: 'text-purple-500', bg: 'bg-purple-50' },
+--+    { icon: MessageCircle, label: 'Матчи', value: matches.length, color: 'text-green-500', bg: 'bg-green-50' },
 --+  ];
 --+
---+  const plans = [
---+    {
---+      id: 'monthly',
---+      name: 'Месячная',
---+      price: 990,
---+      period: 'месяц',
---+      savings: null,
---+      popular: false
+--+  const quickActions = [
+--+    { 
+--+      icon: Zap, 
+--+      label: 'Начать поиск', 
+--+      subtitle: 'Найди свою пару',
+--+      path: '/discovery', 
+--+      gradient: 'from-pink-500 to-red-500' 
 --+    },
---+    {
---+      id: 'quarterly',
---+      name: '3 месяца',
---+      price: 2490,
---+      pricePerMonth: 830,
---+      period: '3 месяца',
---+      savings: '16%',
---+      popular: true
+--+    { 
+--+      icon: MessageCircle, 
+--+      label: 'Сообщения', 
+--+      subtitle: `${matches.length} совпадений`,
+--+      path: '/matches', 
+--+      gradient: 'from-purple-500 to-pink-500',
+--+      badge: matches.filter(m => m.unread_count > 0).length 
 --+    },
---+    {
---+      id: 'yearly',
---+      name: 'Годовая',
---+      price: 7990,
---+      pricePerMonth: 666,
---+      period: 'год',
---+      savings: '33%',
---+      popular: false
---+    }
+--+    { 
+--+      icon: User, 
+--+      label: 'Мой профиль', 
+--+      subtitle: 'Редактировать',
+--+      path: '/profile', 
+--+      gradient: 'from-blue-500 to-cyan-500' 
+--+    },
+--+    { 
+--+      icon: Sparkles, 
+--+      label: 'Premium', 
+--+      subtitle: 'Больше возможностей',
+--+      path: '/premium', 
+--+      gradient: 'from-yellow-500 to-orange-500',
+--+      premium: true
+--+    },
 --+  ];
---+
---+  const handleSubscribe = async () => {
---+    setIsProcessing(true);
---+    try {
---+      const result = await premiumAPI.subscribe(selectedPlan, 'card');
---+      if (result.data.success) {
---+        toast.success('Поздравляем с Premium подпиской! 🎉');
---+        // Redirect to payment or success page
---+      } else {
---+        toast.error('Ошибка оформления подписки');
---+      }
---+    } catch (error) {
---+      toast.error('Не удалось оформить подписку');
---+    } finally {
---+      setIsProcessing(false);
---+    }
---+  };
 -- 
 --   return (
----    <div className="h-full bg-gradient-to-br from-purple-500 to-pink-500 text-white">
----      <div className="p-6">
----        <button onClick={() => navigate(-1)}>
----          <ArrowLeft className="w-6 h-6" />
---+    <div className="h-full overflow-y-auto bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500">
+---    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-red-50 p-6">
+---      <h1 className="text-3xl font-bold mb-6">Главная</h1>
+---      
+---      <div className="space-y-4">
+---        <motion.button
+---          whileTap={{ scale: 0.95 }}
+---          onClick={() => navigate('/discovery')}
+---          className="w-full p-6 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-3xl shadow-xl"
+---        >
+---          <Heart className="w-8 h-8 mx-auto mb-2" />
+---          <div className="font-bold text-lg">Начать знакомства</div>
+---        </motion.button>
+---
+---        <motion.button
+---          whileTap={{ scale: 0.95 }}
+---          onClick={() => navigate('/places')}
+---          className="w-full p-6 bg-white rounded-3xl shadow-xl"
+---        >
+---          <MapPin className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+---          <div className="font-bold text-lg">Куда сходить</div>
+---        </motion.button>
+---
+---        <motion.button
+---          whileTap={{ scale: 0.95 }}
+---          onClick={() => navigate('/premium')}
+---          className="w-full p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-3xl shadow-xl"
+---        >
+---          <Crown className="w-8 h-8 mx-auto mb-2" />
+---          <div className="font-bold text-lg">Premium</div>
+---        </motion.button>
+--+    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
 --+      {/* Header */}
---+      <div className="relative pt-12 pb-8 px-6 text-center text-white">
---+        <button
---+          onClick={() => navigate(-1)}
---+          className="absolute top-4 left-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
---+        >
---+          <CloseIcon className="w-6 h-6" />
---         </button>
+--+      <div className="p-6 pb-0">
+--+        <div className="mb-6">
+--+          <h1 className="text-3xl font-bold text-gray-800 mb-1">
+--+            {greeting}, {user?.full_name?.split(' ')[0] || 'друг'}! 👋
+--+          </h1>
+--+          <p className="text-gray-600">Готовы найти свою любовь сегодня?</p>
+--+        </div>
 --+
---+        <div className="mb-4">
---+          <Crown className="w-20 h-20 mx-auto mb-4 text-yellow-300" strokeWidth={1.5} />
---+          <h1 className="text-4xl font-bold mb-2">ConnectSphere Premium</h1>
---+          <p className="text-white/90 text-lg">
---+            Найдите свою любовь быстрее
---+          </p>
+--+        {/* Stats Grid */}
+--+        <div className="grid grid-cols-4 gap-2 mb-6">
+--+          {stats.map((stat, idx) => (
+--+            <div
+--+              key={idx}
+--+              className={`${stat.bg} rounded-2xl p-3 text-center`}
+--+            >
+--+              <stat.icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
+--+              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+--+              <p className="text-xs text-gray-600 truncate">{stat.label}</p>
+--+            </div>
+--+          ))}
 --+        </div>
 --       </div>
----      
----      <div className="flex flex-col items-center justify-center px-6">
----        <Crown className="w-20 h-20 mb-4" />
----        <h1 className="text-4xl font-bold mb-2">Premium</h1>
----        <p className="text-center text-lg opacity-90">
----          Получите больше возможностей
 --+
---+      {/* Features */}
---+      <div className="px-6 mb-8">
---+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
---+          <h2 className="text-xl font-bold text-white mb-4">
---+            Что вы получаете:
---+          </h2>
---+          <div className="space-y-3">
---+            {features.map((feature, idx) => (
---+              <div key={idx} className="flex items-center gap-3 text-white">
---+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
---+                  <feature.icon className="w-4 h-4" />
---+                </div>
---+                <span className="text-sm font-medium">{feature.text}</span>
---+              </div>
---+            ))}
---+          </div>
---+        </div>
---+      </div>
---+
---+      {/* Plans */}
---+      <div className="px-6 mb-8">
---+        <h2 className="text-xl font-bold text-white mb-4 text-center">
---+          Выберите план:
---+        </h2>
---+        <div className="space-y-3">
---+          {plans.map((plan) => (
+--+      {/* Quick Actions */}
+--+      <div className="px-6">
+--+        <h2 className="text-lg font-bold text-gray-800 mb-4">Быстрые действия</h2>
+--+        <div className="grid grid-cols-2 gap-4 mb-6">
+--+          {quickActions.map((action, index) => (
 --+            <button
---+              key={plan.id}
---+              onClick={() => setSelectedPlan(plan.id)}
---+              className={`w-full rounded-2xl p-5 transition-all relative ${
---+                selectedPlan === plan.id
---+                  ? 'bg-white text-gray-800 shadow-2xl scale-105'
---+                  : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
---+              }`}
+--+              key={index}
+--+              onClick={() => navigate(action.path)}
+--+              className="relative group"
 --+            >
---+              {plan.popular && (
---+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-800 px-4 py-1 rounded-full text-xs font-bold">
---+                  ПОПУЛЯРНЫЙ
---+                </div>
---+              )}
---+              
---+              <div className="flex items-center justify-between">
---+                <div className="text-left">
---+                  <h3 className="font-bold text-lg mb-1">{plan.name}</h3>
---+                  <div className="flex items-baseline gap-2">
---+                    <span className="text-2xl font-bold">{plan.price}₽</span>
---+                    {plan.pricePerMonth && (
---+                      <span className="text-sm opacity-70">
---+                        ({plan.pricePerMonth}₽/мес)
---+                      </span>
---+                    )}
+--+              <div className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 text-white shadow-lg hover:shadow-xl transition-all group-hover:scale-[1.02] active:scale-[0.98]`}>
+--+                {action.badge > 0 && (
+--+                  <div className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
+--+                    <span className="text-xs font-bold">{action.badge}</span>
 --+                  </div>
---+                </div>
---+                
---+                <div className="text-right">
---+                  {plan.savings && (
---+                    <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold mb-1">
---+                      Экономия {plan.savings}
+--+                )}
+--+                {action.premium && (
+--+                  <div className="absolute top-2 right-2">
+--+                    <div className="bg-yellow-400 rounded-full p-1">
+--+                      <Sparkles className="w-3 h-3 text-white" fill="white" />
 --+                    </div>
---+                  )}
---+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
---+                    selectedPlan === plan.id
---+                      ? 'border-purple-600 bg-purple-600'
---+                      : 'border-current'
---+                  }`}>
---+                    {selectedPlan === plan.id && (
---+                      <Check className="w-4 h-4 text-white" strokeWidth={3} />
---+                    )}
 --+                  </div>
---+                </div>
+--+                )}
+--+                <action.icon className="w-10 h-10 mb-3" strokeWidth={2} />
+--+                <p className="font-bold text-base mb-0.5">{action.label}</p>
+--+                <p className="text-xs text-white/80">{action.subtitle}</p>
 --+              </div>
 --+            </button>
 --+          ))}
 --+        </div>
 --+      </div>
 --+
---+      {/* CTA Button */}
---+      <div className="px-6 pb-safe sticky bottom-0 bg-gradient-to-t from-purple-600 pt-4">
---+        <button
---+          onClick={handleSubscribe}
---+          disabled={isProcessing}
---+          className="w-full bg-white text-purple-600 font-bold py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all disabled:opacity-50 mb-4"
---+        >
---+          {isProcessing ? (
---+            <span className="flex items-center justify-center gap-2">
---+              <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
---+              Обработка...
---+            </span>
---+          ) : (
---+            <span>Продолжить</span>
---+          )}
---+        </button>
---+        
---+        <p className="text-white/70 text-xs text-center mb-6">
---+          Подписка автоматически продлевается. Отменить можно в любой момент в настройках.
---         </p>
---       </div>
---+
---+      {/* Testimonials */}
---+      <div className="px-6 py-8 bg-white/5 backdrop-blur-sm">
---+        <h2 className="text-2xl font-bold text-white text-center mb-6">
---+          Что говорят наши пользователи:
---+        </h2>
---+        <div className="space-y-4">
---+          {[
---+            {
---+              name: 'Анна, 28',
---+              text: 'С Premium я нашла свою вторую половинку за 2 недели! Супер лайки реально работают 💕',
---+              rating: 5
---+            },
---+            {
---+              name: 'Дмитрий, 32',
---+              text: 'Возможность видеть, кто лайкнул меня, сильно упростила поиск. Рекомендую!',
---+              rating: 5
---+            },
---+            {
---+              name: 'Мария, 25',
---+              text: 'Безлимитные свайпы это must have! Без Premium было бы сложно найти того самого.',
---+              rating: 5
---+            }
---+          ].map((review, idx) => (
---+            <div
---+              key={idx}
---+              className="bg-white/10 backdrop-blur-md rounded-2xl p-5"
---+            >
---+              <div className="flex items-center gap-2 mb-2">
---+                {[...Array(review.rating)].map((_, i) => (
---+                  <Star key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" />
---+                ))}
+--+      {/* Received Likes Preview */}
+--+      {receivedLikes?.count > 0 && (
+--+        <div className="px-6 mb-6">
+--+          <div 
+--+            onClick={() => navigate('/matches')}
+--+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+--+          >
+--+            <div className="flex items-center justify-between mb-2">
+--+              <div>
+--+                <h3 className="text-xl font-bold mb-1">
+--+                  {receivedLikes.count} {receivedLikes.count === 1 ? 'человек' : 'людей'} лайкнул вас!
+--+                </h3>
+--+                <p className="text-white/90 text-sm">
+--+                  {receivedLikes.premium_required 
+--+                    ? 'Обновитесь до Premium, чтобы увидеть'
+--+                    : 'Посмотрите, кто вас лайкнул'
+--+                  }
+--+                </p>
 --+              </div>
---+              <p className="text-white text-sm mb-2">{review.text}</p>
---+              <p className="text-white/60 text-xs font-semibold">{review.name}</p>
+--+              <Star className="w-12 h-12" fill="white" />
 --+            </div>
---+          ))}
+--+          </div>
+--+        </div>
+--+      )}
+--+
+--+      {/* Tips Section */}
+--+      <div className="px-6 pb-8">
+--+        <div className="bg-white rounded-3xl p-6 shadow-md">
+--+          <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+--+            <Sparkles className="w-5 h-5 text-pink-500" />
+--+            Совет дня
+--+          </h3>
+--+          <p className="text-gray-600 text-sm leading-relaxed">
+--+            Добавьте больше фотографий в свой профиль! Анкеты с 3+ фото получают на 40% больше совпадений 📸
+--+          </p>
 --+        </div>
 --+      </div>
 --+
---+      <div className="h-20" /> {/* Bottom spacing */}
+--+      <div className="h-20" /> {/* Bottom spacing for nav */}
 --     </div>
 --   );
 -- };
 --diff --git a/model.patch b/model.patch
---index 44388d6..661879e 100644
+--index 60e425e..ecbecf3 100644
 ----- a/model.patch
 --+++ b/model.patch
---@@ -1,724 +0,0 @@
----diff --git a/frontend/src/pages/ProfilePage.jsx b/frontend/src/pages/ProfilePage.jsx
----index b037b31..c6e0a65 100644
------- a/frontend/src/pages/ProfilePage.jsx
----+++ b/frontend/src/pages/ProfilePage.jsx
----@@ -1,24 +1,242 @@
-----import { motion } from 'framer-motion';
----+import { useState, useEffect } from 'react';
----+import { useNavigate } from 'react-router-dom';
---- import { useAuthStore } from '../stores/authStore';
----+import { Camera, Settings, Edit, MapPin, Briefcase, Heart, Star, Eye, Crown } from 'lucide-react';
+--@@ -1,976 +0,0 @@
+---diff --git a/frontend/src/pages/PremiumPage.jsx b/frontend/src/pages/PremiumPage.jsx
+---index 7cfcc24..a516451 100644
+------ a/frontend/src/pages/PremiumPage.jsx
+---+++ b/frontend/src/pages/PremiumPage.jsx
+---@@ -1,24 +1,231 @@
+---+import { useState } from 'react';
+--- import { useNavigate } from 'react-router-dom';
+----import { ArrowLeft, Crown } from 'lucide-react';
+---+import { Crown, Check, X as CloseIcon, Sparkles, Zap, Eye, RefreshCw, Star } from 'lucide-react';
+---+import { premiumAPI } from '../utils/api';
 ---+import toast from 'react-hot-toast';
 --- 
---- const ProfilePage = () => {
-----  const user = useAuthStore(state => state.user);
----+  const navigate = useNavigate();
----+  const { user, updateProfile } = useAuthStore();
----+  const [isEditing, setIsEditing] = useState(false);
----+  const [editForm, setEditForm] = useState({
----+    bio: user?.bio || '',
----+    job_title: user?.job_title || '',
----+    interests: user?.interests || []
----+  });
+--- const PremiumPage = () => {
+---   const navigate = useNavigate();
+---+  const [selectedPlan, setSelectedPlan] = useState('monthly');
+---+  const [isProcessing, setIsProcessing] = useState(false);
 ---+
----+  const stats = [
----+    { icon: Eye, label: 'Просмотры', value: user?.profile_views || 0, color: 'text-blue-500' },
----+    { icon: Heart, label: 'Лайки', value: user?.total_likes_received || 0, color: 'text-pink-500' },
----+    { icon: Star, label: 'Super Likes', value: user?.total_super_likes_received || 0, color: 'text-purple-500' },
+---+  const features = [
+---+    { icon: Zap, text: 'Безлимитные свайпы', premium: true },
+---+    { icon: Star, text: 'Безлимитные Super Likes', premium: true },
+---+    { icon: Eye, text: 'Смотрите, кто вас лайкнул', premium: true },
+---+    { icon: RefreshCw, text: 'Отменяйте свайпы', premium: true },
+---+    { icon: Crown, text: 'Профильный значок Premium', premium: true },
+---+    { icon: Sparkles, text: 'Буст профиля 1x в месяц', premium: true },
+---+    { icon: Check, text: 'Приоритет в показе', premium: true },
+---+    { icon: Check, text: 'Режим невидимки', premium: true },
+---+    { icon: Check, text: 'Продвинутые фильтры', premium: true },
+---+    { icon: Check, text: 'Отключение рекламы', premium: true },
 ---+  ];
 ---+
----+  const handleSaveProfile = async () => {
----+    const result = await updateProfile(editForm);
----+    if (result.success) {
----+      toast.success('Профиль обновлен');
----+      setIsEditing(false);
----+    } else {
----+      toast.error(result.error || 'Ошибка обновления');
+---+  const plans = [
+---+    {
+---+      id: 'monthly',
+---+      name: 'Месячная',
+---+      price: 990,
+---+      period: 'месяц',
+---+      savings: null,
+---+      popular: false
+---+    },
+---+    {
+---+      id: 'quarterly',
+---+      name: '3 месяца',
+---+      price: 2490,
+---+      pricePerMonth: 830,
+---+      period: '3 месяца',
+---+      savings: '16%',
+---+      popular: true
+---+    },
+---+    {
+---+      id: 'yearly',
+---+      name: 'Годовая',
+---+      price: 7990,
+---+      pricePerMonth: 666,
+---+      period: 'год',
+---+      savings: '33%',
+---+      popular: false
+---+    }
+---+  ];
+---+
+---+  const handleSubscribe = async () => {
+---+    setIsProcessing(true);
+---+    try {
+---+      const result = await premiumAPI.subscribe(selectedPlan, 'card');
+---+      if (result.data.success) {
+---+        toast.success('Поздравляем с Premium подпиской! 🎉');
+---+        // Redirect to payment or success page
+---+      } else {
+---+        toast.error('Ошибка оформления подписки');
+---+      }
+---+    } catch (error) {
+---+      toast.error('Не удалось оформить подписку');
+---+    } finally {
+---+      setIsProcessing(false);
 ---+    }
 ---+  };
 --- 
 ---   return (
-----    <div className="h-full overflow-y-auto bg-gray-50 p-6">
-----      <h1 className="text-3xl font-bold mb-6">Профиль</h1>
-----      
-----      <motion.div
-----        initial={{ y: 20, opacity: 0 }}
-----        animate={{ y: 0, opacity: 1 }}
-----        className="bg-white rounded-3xl p-6 shadow-xl"
-----      >
-----        <div className="text-6xl text-center mb-4">👤</div>
-----        <h2 className="text-2xl font-bold text-center mb-2">
-----          {user?.full_name || user?.username || 'Пользователь'}
-----        </h2>
-----        <p className="text-center text-gray-600">{user?.email}</p>
-----      </motion.div>
----+    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-orange-50">
----+      {/* Header with photo */}
----+      <div className="relative">
----+        <div className="h-80 bg-gradient-to-br from-pink-500 to-orange-500 relative overflow-hidden">
----+          {user?.photos?.[0] ? (
----+            <img
----+              src={user.photos[0]}
----+              alt="Profile"
----+              className="w-full h-full object-cover"
----+            />
----+          ) : (
----+            <div className="w-full h-full flex items-center justify-center">
----+              <Camera className="w-20 h-20 text-white/50" />
----+            </div>
----+          )}
----+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
----+          
----+          {/* Settings button */}
----+          <button
----+            onClick={() => navigate('/settings')}
----+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
----+          >
----+            <Settings className="w-5 h-5 text-white" />
----+          </button>
+----    <div className="h-full bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+----      <div className="p-6">
+----        <button onClick={() => navigate(-1)}>
+----          <ArrowLeft className="w-6 h-6" />
+---+    <div className="h-full overflow-y-auto bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500">
+---+      {/* Header */}
+---+      <div className="relative pt-12 pb-8 px-6 text-center text-white">
+---+        <button
+---+          onClick={() => navigate(-1)}
+---+          className="absolute top-4 left-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+---+        >
+---+          <CloseIcon className="w-6 h-6" />
+---         </button>
 ---+
----+          {/* Premium badge */}
----+          {user?.is_premium && (
----+            <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 px-3 py-1 rounded-full flex items-center gap-1">
----+              <Crown className="w-4 h-4 text-white" />
----+              <span className="text-xs font-bold text-white">PREMIUM</span>
----+            </div>
----+          )}
+---+        <div className="mb-4">
+---+          <Crown className="w-20 h-20 mx-auto mb-4 text-yellow-300" strokeWidth={1.5} />
+---+          <h1 className="text-4xl font-bold mb-2">ConnectSphere Premium</h1>
+---+          <p className="text-white/90 text-lg">
+---+            Найдите свою любовь быстрее
+---+          </p>
 ---+        </div>
+---       </div>
+----      
+----      <div className="flex flex-col items-center justify-center px-6">
+----        <Crown className="w-20 h-20 mb-4" />
+----        <h1 className="text-4xl font-bold mb-2">Premium</h1>
+----        <p className="text-center text-lg opacity-90">
+----          Получите больше возможностей
 ---+
----+        {/* Main info card */}
----+        <div className="px-4 -mt-20 relative z-10">
----+          <div className="bg-white rounded-3xl p-6 shadow-xl">
----+            <div className="flex items-start justify-between mb-4">
----+              <div className="flex-1">
----+                <div className="flex items-center gap-2 mb-1">
----+                  <h1 className="text-2xl font-bold text-gray-800">
----+                    {user?.full_name || 'Без имени'}, {user?.age || '?'}
----+                  </h1>
----+                  {user?.is_verified && (
----+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
----+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
----+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
----+                      </svg>
----+                    </div>
----+                  )}
+---+      {/* Features */}
+---+      <div className="px-6 mb-8">
+---+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6">
+---+          <h2 className="text-xl font-bold text-white mb-4">
+---+            Что вы получаете:
+---+          </h2>
+---+          <div className="space-y-3">
+---+            {features.map((feature, idx) => (
+---+              <div key={idx} className="flex items-center gap-3 text-white">
+---+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+---+                  <feature.icon className="w-4 h-4" />
+---+                </div>
+---+                <span className="text-sm font-medium">{feature.text}</span>
+---+              </div>
+---+            ))}
+---+          </div>
+---+        </div>
+---+      </div>
+---+
+---+      {/* Plans */}
+---+      <div className="px-6 mb-8">
+---+        <h2 className="text-xl font-bold text-white mb-4 text-center">
+---+          Выберите план:
+---+        </h2>
+---+        <div className="space-y-3">
+---+          {plans.map((plan) => (
+---+            <button
+---+              key={plan.id}
+---+              onClick={() => setSelectedPlan(plan.id)}
+---+              className={`w-full rounded-2xl p-5 transition-all relative ${
+---+                selectedPlan === plan.id
+---+                  ? 'bg-white text-gray-800 shadow-2xl scale-105'
+---+                  : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
+---+              }`}
+---+            >
+---+              {plan.popular && (
+---+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-800 px-4 py-1 rounded-full text-xs font-bold">
+---+                  ПОПУЛЯРНЫЙ
+---+                </div>
+---+              )}
+---+              
+---+              <div className="flex items-center justify-between">
+---+                <div className="text-left">
+---+                  <h3 className="font-bold text-lg mb-1">{plan.name}</h3>
+---+                  <div className="flex items-baseline gap-2">
+---+                    <span className="text-2xl font-bold">{plan.price}₽</span>
+---+                    {plan.pricePerMonth && (
+---+                      <span className="text-sm opacity-70">
+---+                        ({plan.pricePerMonth}₽/мес)
+---+                      </span>
+---+                    )}
+---+                  </div>
 ---+                </div>
 ---+                
----+                <div className="space-y-1 text-sm text-gray-600">
----+                  {user?.job_title && (
----+                    <div className="flex items-center gap-2">
----+                      <Briefcase className="w-4 h-4" />
----+                      <span>{user.job_title}</span>
+---+                <div className="text-right">
+---+                  {plan.savings && (
+---+                    <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold mb-1">
+---+                      Экономия {plan.savings}
 ---+                    </div>
 ---+                  )}
----+                  {user?.city && (
----+                    <div className="flex items-center gap-2">
----+                      <MapPin className="w-4 h-4" />
----+                      <span>{user.city}</span>
----+                    </div>
----+                  )}
----+                </div>
----+              </div>
----+
----+              <button
----+                onClick={() => setIsEditing(!isEditing)}
----+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
----+              >
----+                <Edit className="w-5 h-5 text-gray-600" />
----+              </button>
----+            </div>
----+
----+            {/* Stats */}
----+            <div className="grid grid-cols-3 gap-4 mb-6 pt-4 border-t border-gray-100">
----+              {stats.map((stat, idx) => (
----+                <div key={idx} className="text-center">
----+                  <stat.icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
----+                  <p className="text-xl font-bold text-gray-800">{stat.value}</p>
----+                  <p className="text-xs text-gray-500">{stat.label}</p>
----+                </div>
----+              ))}
----+            </div>
----+
----+            {/* Bio */}
----+            {isEditing ? (
----+              <div className="space-y-4">
----+                <div>
----+                  <label className="block text-sm font-medium text-gray-700 mb-2">
----+                    О себе
----+                  </label>
----+                  <textarea
----+                    value={editForm.bio}
----+                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
----+                    rows={4}
----+                    maxLength={500}
----+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
----+                    placeholder="Расскажите о себе..."
----+                  />
----+                  <p className="text-xs text-gray-500 mt-1">
----+                    {editForm.bio.length}/500
----+                  </p>
----+                </div>
----+
----+                <div>
----+                  <label className="block text-sm font-medium text-gray-700 mb-2">
----+                    Профессия
----+                  </label>
----+                  <input
----+                    type="text"
----+                    value={editForm.job_title}
----+                    onChange={(e) => setEditForm({ ...editForm, job_title: e.target.value })}
----+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500"
----+                    placeholder="Ваша профессия"
----+                  />
----+                </div>
----+
----+                <div className="flex gap-3">
----+                  <button
----+                    onClick={handleSaveProfile}
----+                    className="flex-1 btn-primary"
----+                  >
----+                    Сохранить
----+                  </button>
----+                  <button
----+                    onClick={() => setIsEditing(false)}
----+                    className="flex-1 btn-secondary"
----+                  >
----+                    Отмена
----+                  </button>
----+                </div>
----+              </div>
----+            ) : (
----+              <div>
----+                <h3 className="font-semibold text-gray-800 mb-2">О себе</h3>
----+                <p className="text-gray-600 text-sm leading-relaxed">
----+                  {user?.bio || 'Расскажите о себе...'}
----+                </p>
----+              </div>
----+            )}
----+          </div>
----+        </div>
----+
----+        {/* Interests */}
----+        {user?.interests && user.interests.length > 0 && (
----+          <div className="px-4 mt-4">
----+            <div className="bg-white rounded-3xl p-6 shadow-lg">
----+              <h3 className="font-semibold text-gray-800 mb-3">Интересы</h3>
----+              <div className="flex flex-wrap gap-2">
----+                {user.interests.map((interest, idx) => (
----+                  <span
----+                    key={idx}
----+                    className="px-4 py-2 bg-gradient-to-r from-pink-100 to-orange-100 text-pink-700 rounded-full text-sm font-medium"
----+                  >
----+                    {interest}
----+                  </span>
----+                ))}
----+              </div>
----+            </div>
----+          </div>
----+        )}
----+
----+        {/* Photos grid */}
----+        {user?.photos && user.photos.length > 1 && (
----+          <div className="px-4 mt-4">
----+            <div className="bg-white rounded-3xl p-6 shadow-lg">
----+              <h3 className="font-semibold text-gray-800 mb-3">Фотографии</h3>
----+              <div className="grid grid-cols-3 gap-2">
----+                {user.photos.slice(1).map((photo, idx) => (
----+                  <div key={idx} className="aspect-square rounded-2xl overflow-hidden">
----+                    <img
----+                      src={photo}
----+                      alt={`Photo ${idx + 2}`}
----+                      className="w-full h-full object-cover"
----+                    />
+---+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+---+                    selectedPlan === plan.id
+---+                      ? 'border-purple-600 bg-purple-600'
+---+                      : 'border-current'
+---+                  }`}>
+---+                    {selectedPlan === plan.id && (
+---+                      <Check className="w-4 h-4 text-white" strokeWidth={3} />
+---+                    )}
 ---+                  </div>
+---+                </div>
+---+              </div>
+---+            </button>
+---+          ))}
+---+        </div>
+---+      </div>
+---+
+---+      {/* CTA Button */}
+---+      <div className="px-6 pb-safe sticky bottom-0 bg-gradient-to-t from-purple-600 pt-4">
+---+        <button
+---+          onClick={handleSubscribe}
+---+          disabled={isProcessing}
+---+          className="w-full bg-white text-purple-600 font-bold py-4 rounded-full shadow-2xl hover:shadow-3xl transition-all disabled:opacity-50 mb-4"
+---+        >
+---+          {isProcessing ? (
+---+            <span className="flex items-center justify-center gap-2">
+---+              <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+---+              Обработка...
+---+            </span>
+---+          ) : (
+---+            <span>Продолжить</span>
+---+          )}
+---+        </button>
+---+        
+---+        <p className="text-white/70 text-xs text-center mb-6">
+---+          Подписка автоматически продлевается. Отменить можно в любой момент в настройках.
+---         </p>
+---       </div>
+---+
+---+      {/* Testimonials */}
+---+      <div className="px-6 py-8 bg-white/5 backdrop-blur-sm">
+---+        <h2 className="text-2xl font-bold text-white text-center mb-6">
+---+          Что говорят наши пользователи:
+---+        </h2>
+---+        <div className="space-y-4">
+---+          {[
+---+            {
+---+              name: 'Анна, 28',
+---+              text: 'С Premium я нашла свою вторую половинку за 2 недели! Супер лайки реально работают 💕',
+---+              rating: 5
+---+            },
+---+            {
+---+              name: 'Дмитрий, 32',
+---+              text: 'Возможность видеть, кто лайкнул меня, сильно упростила поиск. Рекомендую!',
+---+              rating: 5
+---+            },
+---+            {
+---+              name: 'Мария, 25',
+---+              text: 'Безлимитные свайпы это must have! Без Premium было бы сложно найти того самого.',
+---+              rating: 5
+---+            }
+---+          ].map((review, idx) => (
+---+            <div
+---+              key={idx}
+---+              className="bg-white/10 backdrop-blur-md rounded-2xl p-5"
+---+            >
+---+              <div className="flex items-center gap-2 mb-2">
+---+                {[...Array(review.rating)].map((_, i) => (
+---+                  <Star key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" />
 ---+                ))}
 ---+              </div>
+---+              <p className="text-white text-sm mb-2">{review.text}</p>
+---+              <p className="text-white/60 text-xs font-semibold">{review.name}</p>
 ---+            </div>
----+          </div>
----+        )}
----+
----+        {/* Premium CTA */}
----+        {!user?.is_premium && (
----+          <div className="px-4 mt-4 mb-6">
----+            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white">
----+              <Crown className="w-12 h-12 mb-3" />
----+              <h3 className="text-xl font-bold mb-2">Обновите до Premium</h3>
----+              <p className="text-white/90 text-sm mb-4">
----+                Получите безлимитные свайпы, супер лайки и видите, кто вас лайкнул!
----+              </p>
----+              <button
----+                onClick={() => navigate('/premium')}
----+                className="w-full bg-white text-purple-600 font-semibold py-3 rounded-full hover:bg-gray-100 transition-colors"
----+              >
----+                Узнать больше
----+              </button>
----+            </div>
----+          </div>
----+        )}
----+
----+        <div className="h-20" /> {/* Bottom spacing for nav */}
+---+          ))}
+---+        </div>
 ---+      </div>
+---+
+---+      <div className="h-20" /> {/* Bottom spacing */}
 ---     </div>
 ---   );
 --- };
 ---diff --git a/model.patch b/model.patch
----index 559a6bd..61e26d0 100644
+---index 44388d6..661879e 100644
 ------ a/model.patch
 ---+++ b/model.patch
----@@ -1,456 +0,0 @@
-----diff --git a/frontend/src/pages/MatchesPage.jsx b/frontend/src/pages/MatchesPage.jsx
-----index d67bd79..523da24 100644
-------- a/frontend/src/pages/MatchesPage.jsx
-----+++ b/frontend/src/pages/MatchesPage.jsx
-----@@ -1,17 +1,232 @@
+---@@ -1,724 +0,0 @@
+----diff --git a/frontend/src/pages/ProfilePage.jsx b/frontend/src/pages/ProfilePage.jsx
+----index b037b31..c6e0a65 100644
+------- a/frontend/src/pages/ProfilePage.jsx
+----+++ b/frontend/src/pages/ProfilePage.jsx
+----@@ -1,24 +1,242 @@
 -----import { motion } from 'framer-motion';
 ----+import { useState, useEffect } from 'react';
 ----+import { useNavigate } from 'react-router-dom';
-----+import { useUserStore } from '../stores/userStore';
-----+import { MessageCircle, Heart, Clock, Star } from 'lucide-react';
-----+import { formatDistanceToNow } from 'date-fns';
-----+import { ru } from 'date-fns/locale';
+---- import { useAuthStore } from '../stores/authStore';
+----+import { Camera, Settings, Edit, MapPin, Briefcase, Heart, Star, Eye, Crown } from 'lucide-react';
+----+import toast from 'react-hot-toast';
 ---- 
----- const MatchesPage = () => {
+---- const ProfilePage = () => {
+-----  const user = useAuthStore(state => state.user);
 ----+  const navigate = useNavigate();
-----+  const { matches, loadMatches, isLoadingMatches, receivedLikes, loadReceivedLikes } = useUserStore();
-----+  const [activeTab, setActiveTab] = useState('matches'); // 'matches' or 'likes'
+----+  const { user, updateProfile } = useAuthStore();
+----+  const [isEditing, setIsEditing] = useState(false);
+----+  const [editForm, setEditForm] = useState({
+----+    bio: user?.bio || '',
+----+    job_title: user?.job_title || '',
+----+    interests: user?.interests || []
+----+  });
 ----+
-----+  useEffect(() => {
-----+    loadMatches();
-----+    loadReceivedLikes();
-----+  }, []);
+----+  const stats = [
+----+    { icon: Eye, label: 'Просмотры', value: user?.profile_views || 0, color: 'text-blue-500' },
+----+    { icon: Heart, label: 'Лайки', value: user?.total_likes_received || 0, color: 'text-pink-500' },
+----+    { icon: Star, label: 'Super Likes', value: user?.total_super_likes_received || 0, color: 'text-purple-500' },
+----+  ];
 ----+
-----+  const formatTime = (timestamp) => {
-----+    try {
-----+      return formatDistanceToNow(new Date(timestamp), { 
-----+        addSuffix: true, 
-----+        locale: ru 
-----+      });
-----+    } catch {
-----+      return '';
+----+  const handleSaveProfile = async () => {
+----+    const result = await updateProfile(editForm);
+----+    if (result.success) {
+----+      toast.success('Профиль обновлен');
+----+      setIsEditing(false);
+----+    } else {
+----+      toast.error(result.error || 'Ошибка обновления');
 ----+    }
 ----+  };
-----+
-----+  if (isLoadingMatches) {
-----+    return (
-----+      <div className="h-full flex items-center justify-center bg-gray-50">
-----+        <div className="text-center">
-----+          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-----+          <p className="text-gray-600">Загружаем совпадения...</p>
-----+        </div>
-----+      </div>
-----+    );
-----+  }
-----+
+---- 
 ----   return (
------    <div className="h-full flex items-center justify-center bg-gray-50">
+-----    <div className="h-full overflow-y-auto bg-gray-50 p-6">
+-----      <h1 className="text-3xl font-bold mb-6">Профиль</h1>
+-----      
 -----      <motion.div
------        initial={{ scale: 0 }}
------        animate={{ scale: 1 }}
------        className="text-center p-6"
+-----        initial={{ y: 20, opacity: 0 }}
+-----        animate={{ y: 0, opacity: 1 }}
+-----        className="bg-white rounded-3xl p-6 shadow-xl"
 -----      >
------        <div className="text-6xl mb-4">💬</div>
------        <h2 className="text-2xl font-bold mb-2">Чаты</h2>
------        <p className="text-gray-600">Ваши совпадения</p>
+-----        <div className="text-6xl text-center mb-4">👤</div>
+-----        <h2 className="text-2xl font-bold text-center mb-2">
+-----          {user?.full_name || user?.username || 'Пользователь'}
+-----        </h2>
+-----        <p className="text-center text-gray-600">{user?.email}</p>
 -----      </motion.div>
-----+    <div className="h-full flex flex-col bg-gray-50">
-----+      {/* Header */}
-----+      <div className="bg-white border-b border-gray-200">
-----+        <div className="p-4">
-----+          <h1 className="text-2xl font-bold text-gray-800">Совпадения</h1>
-----+        </div>
-----+
-----+        {/* Tabs */}
-----+        <div className="flex border-b border-gray-200">
-----+          <button
-----+            onClick={() => setActiveTab('matches')}
-----+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
-----+              activeTab === 'matches'
-----+                ? 'text-pink-600'
-----+                : 'text-gray-500'
-----+            }`}
-----+          >
-----+            <div className="flex items-center justify-center gap-2">
-----+              <Heart className="w-4 h-4" />
-----+              Матчи ({matches.length})
+----+    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-orange-50">
+----+      {/* Header with photo */}
+----+      <div className="relative">
+----+        <div className="h-80 bg-gradient-to-br from-pink-500 to-orange-500 relative overflow-hidden">
+----+          {user?.photos?.[0] ? (
+----+            <img
+----+              src={user.photos[0]}
+----+              alt="Profile"
+----+              className="w-full h-full object-cover"
+----+            />
+----+          ) : (
+----+            <div className="w-full h-full flex items-center justify-center">
+----+              <Camera className="w-20 h-20 text-white/50" />
 ----+            </div>
-----+            {activeTab === 'matches' && (
-----+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink-600" />
-----+            )}
-----+          </button>
+----+          )}
+----+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 ----+          
+----+          {/* Settings button */}
 ----+          <button
-----+            onClick={() => setActiveTab('likes')}
-----+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
-----+              activeTab === 'likes'
-----+                ? 'text-pink-600'
-----+                : 'text-gray-500'
-----+            }`}
+----+            onClick={() => navigate('/settings')}
+----+            className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
 ----+          >
-----+            <div className="flex items-center justify-center gap-2">
-----+              <Star className="w-4 h-4" />
-----+              Лайки ({receivedLikes?.count || 0})
-----+            </div>
-----+            {activeTab === 'likes' && (
-----+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink-600" />
-----+            )}
+----+            <Settings className="w-5 h-5 text-white" />
 ----+          </button>
-----+        </div>
-----+      </div>
 ----+
-----+      {/* Content */}
-----+      <div className="flex-1 overflow-y-auto">
-----+        {activeTab === 'matches' ? (
-----+          matches.length === 0 ? (
-----+            <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-----+              <Heart className="w-20 h-20 text-gray-300 mb-4" />
-----+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-----+                Пока нет совпадений
-----+              </h3>
-----+              <p className="text-gray-600 mb-6">
-----+                Начните свайпать, чтобы найти свои матчи!
-----+              </p>
+----+          {/* Premium badge */}
+----+          {user?.is_premium && (
+----+            <div className="absolute top-4 left-4 bg-gradient-to-r from-yellow-400 to-orange-500 px-3 py-1 rounded-full flex items-center gap-1">
+----+              <Crown className="w-4 h-4 text-white" />
+----+              <span className="text-xs font-bold text-white">PREMIUM</span>
+----+            </div>
+----+          )}
+----+        </div>
+----+
+----+        {/* Main info card */}
+----+        <div className="px-4 -mt-20 relative z-10">
+----+          <div className="bg-white rounded-3xl p-6 shadow-xl">
+----+            <div className="flex items-start justify-between mb-4">
+----+              <div className="flex-1">
+----+                <div className="flex items-center gap-2 mb-1">
+----+                  <h1 className="text-2xl font-bold text-gray-800">
+----+                    {user?.full_name || 'Без имени'}, {user?.age || '?'}
+----+                  </h1>
+----+                  {user?.is_verified && (
+----+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+----+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+----+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+----+                      </svg>
+----+                    </div>
+----+                  )}
+----+                </div>
+----+                
+----+                <div className="space-y-1 text-sm text-gray-600">
+----+                  {user?.job_title && (
+----+                    <div className="flex items-center gap-2">
+----+                      <Briefcase className="w-4 h-4" />
+----+                      <span>{user.job_title}</span>
+----+                    </div>
+----+                  )}
+----+                  {user?.city && (
+----+                    <div className="flex items-center gap-2">
+----+                      <MapPin className="w-4 h-4" />
+----+                      <span>{user.city}</span>
+----+                    </div>
+----+                  )}
+----+                </div>
+----+              </div>
+----+
 ----+              <button
-----+                onClick={() => navigate('/discovery')}
-----+                className="btn-primary"
+----+                onClick={() => setIsEditing(!isEditing)}
+----+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
 ----+              >
-----+                Начать поиск
+----+                <Edit className="w-5 h-5 text-gray-600" />
 ----+              </button>
 ----+            </div>
-----+          ) : (
-----+            <div className="p-4 space-y-3">
-----+              {matches.map((match) => (
-----+                <div
-----+                  key={match.match_id}
-----+                  onClick={() => navigate(`/chat/${match.match_id}`)}
-----+                  className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-----+                >
-----+                  <div className="flex items-center gap-4">
-----+                    {/* Avatar */}
-----+                    <div className="relative">
-----+                      <img
-----+                        src={match.matched_user?.photos?.[0] || '/placeholder-user.png'}
-----+                        alt={match.matched_user?.full_name}
-----+                        className="w-16 h-16 rounded-full object-cover"
-----+                      />
-----+                      {match.matched_user?.is_verified && (
-----+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
-----+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-----+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-----+                          </svg>
-----+                        </div>
-----+                      )}
-----+                    </div>
 ----+
-----+                    {/* Info */}
-----+                    <div className="flex-1 min-w-0">
-----+                      <h3 className="font-semibold text-gray-800 truncate">
-----+                        {match.matched_user?.full_name}
-----+                      </h3>
-----+                      
-----+                      {match.last_message ? (
-----+                        <p className="text-sm text-gray-600 truncate">
-----+                          {match.last_message.content}
-----+                        </p>
-----+                      ) : (
-----+                        <p className="text-sm text-pink-500">
-----+                          Новый матч! Напишите первым
-----+                        </p>
-----+                      )}
-----+                      
-----+                      <div className="flex items-center gap-2 mt-1">
-----+                        <Clock className="w-3 h-3 text-gray-400" />
-----+                        <span className="text-xs text-gray-400">
-----+                          {formatTime(match.created_at)}
-----+                        </span>
-----+                      </div>
-----+                    </div>
-----+
-----+                    {/* Message indicator */}
-----+                    <div className="flex flex-col items-end gap-2">
-----+                      <MessageCircle className="w-5 h-5 text-pink-500" />
-----+                      {match.unread_count > 0 && (
-----+                        <div className="w-5 h-5 bg-pink-500 rounded-full flex items-center justify-center">
-----+                          <span className="text-xs text-white font-bold">
-----+                            {match.unread_count > 9 ? '9+' : match.unread_count}
-----+                          </span>
-----+                        </div>
-----+                      )}
-----+                    </div>
-----+                  </div>
+----+            {/* Stats */}
+----+            <div className="grid grid-cols-3 gap-4 mb-6 pt-4 border-t border-gray-100">
+----+              {stats.map((stat, idx) => (
+----+                <div key={idx} className="text-center">
+----+                  <stat.icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
+----+                  <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+----+                  <p className="text-xs text-gray-500">{stat.label}</p>
 ----+                </div>
 ----+              ))}
 ----+            </div>
-----+          )
-----+        ) : (
-----+          // Likes tab
-----+          <div className="p-4">
-----+            {receivedLikes?.premium_required ? (
-----+              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white text-center">
-----+                <Star className="w-16 h-16 mx-auto mb-4" fill="white" />
-----+                <h3 className="text-xl font-bold mb-2">
-----+                  {receivedLikes.count} {receivedLikes.count === 1 ? 'человек' : 'людей'} лайкнул вас!
-----+                </h3>
-----+                <p className="text-white/90 mb-4">
-----+                  Обновитесь до Premium, чтобы увидеть, кто вас лайкнул
-----+                </p>
-----+                <button
-----+                  onClick={() => navigate('/premium')}
-----+                  className="bg-white text-purple-600 font-semibold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors"
-----+                >
-----+                  Перейти на Premium
-----+                </button>
-----+              </div>
-----+            ) : receivedLikes?.users && receivedLikes.users.length > 0 ? (
-----+              <div className="grid grid-cols-2 gap-3">
-----+                {receivedLikes.users.map((user) => (
-----+                  <div
-----+                    key={user.id}
-----+                    className="bg-white rounded-2xl overflow-hidden shadow-sm"
+----+
+----+            {/* Bio */}
+----+            {isEditing ? (
+----+              <div className="space-y-4">
+----+                <div>
+----+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+----+                    О себе
+----+                  </label>
+----+                  <textarea
+----+                    value={editForm.bio}
+----+                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+----+                    rows={4}
+----+                    maxLength={500}
+----+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+----+                    placeholder="Расскажите о себе..."
+----+                  />
+----+                  <p className="text-xs text-gray-500 mt-1">
+----+                    {editForm.bio.length}/500
+----+                  </p>
+----+                </div>
+----+
+----+                <div>
+----+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+----+                    Профессия
+----+                  </label>
+----+                  <input
+----+                    type="text"
+----+                    value={editForm.job_title}
+----+                    onChange={(e) => setEditForm({ ...editForm, job_title: e.target.value })}
+----+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500"
+----+                    placeholder="Ваша профессия"
+----+                  />
+----+                </div>
+----+
+----+                <div className="flex gap-3">
+----+                  <button
+----+                    onClick={handleSaveProfile}
+----+                    className="flex-1 btn-primary"
 ----+                  >
-----+                    <div className="aspect-square relative">
-----+                      <img
-----+                        src={user.photos?.[0] || '/placeholder-user.png'}
-----+                        alt={user.full_name}
-----+                        className="w-full h-full object-cover"
-----+                      />
-----+                      {user.is_super_like && (
-----+                        <div className="absolute top-2 right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-----+                          <Star className="w-5 h-5 text-white" fill="white" />
-----+                        </div>
-----+                      )}
-----+                    </div>
-----+                    <div className="p-3">
-----+                      <h4 className="font-semibold text-sm truncate">
-----+                        {user.full_name}, {user.age}
-----+                      </h4>
-----+                      {user.job_title && (
-----+                        <p className="text-xs text-gray-600 truncate">
-----+                          {user.job_title}
-----+                        </p>
-----+                      )}
-----+                    </div>
-----+                  </div>
-----+                ))}
+----+                    Сохранить
+----+                  </button>
+----+                  <button
+----+                    onClick={() => setIsEditing(false)}
+----+                    className="flex-1 btn-secondary"
+----+                  >
+----+                    Отмена
+----+                  </button>
+----+                </div>
 ----+              </div>
 ----+            ) : (
-----+              <div className="text-center py-12">
-----+                <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-----+                <p className="text-gray-600">Пока никто не лайкнул вас</p>
+----+              <div>
+----+                <h3 className="font-semibold text-gray-800 mb-2">О себе</h3>
+----+                <p className="text-gray-600 text-sm leading-relaxed">
+----+                  {user?.bio || 'Расскажите о себе...'}
+----+                </p>
 ----+              </div>
 ----+            )}
 ----+          </div>
+----+        </div>
+----+
+----+        {/* Interests */}
+----+        {user?.interests && user.interests.length > 0 && (
+----+          <div className="px-4 mt-4">
+----+            <div className="bg-white rounded-3xl p-6 shadow-lg">
+----+              <h3 className="font-semibold text-gray-800 mb-3">Интересы</h3>
+----+              <div className="flex flex-wrap gap-2">
+----+                {user.interests.map((interest, idx) => (
+----+                  <span
+----+                    key={idx}
+----+                    className="px-4 py-2 bg-gradient-to-r from-pink-100 to-orange-100 text-pink-700 rounded-full text-sm font-medium"
+----+                  >
+----+                    {interest}
+----+                  </span>
+----+                ))}
+----+              </div>
+----+            </div>
+----+          </div>
 ----+        )}
+----+
+----+        {/* Photos grid */}
+----+        {user?.photos && user.photos.length > 1 && (
+----+          <div className="px-4 mt-4">
+----+            <div className="bg-white rounded-3xl p-6 shadow-lg">
+----+              <h3 className="font-semibold text-gray-800 mb-3">Фотографии</h3>
+----+              <div className="grid grid-cols-3 gap-2">
+----+                {user.photos.slice(1).map((photo, idx) => (
+----+                  <div key={idx} className="aspect-square rounded-2xl overflow-hidden">
+----+                    <img
+----+                      src={photo}
+----+                      alt={`Photo ${idx + 2}`}
+----+                      className="w-full h-full object-cover"
+----+                    />
+----+                  </div>
+----+                ))}
+----+              </div>
+----+            </div>
+----+          </div>
+----+        )}
+----+
+----+        {/* Premium CTA */}
+----+        {!user?.is_premium && (
+----+          <div className="px-4 mt-4 mb-6">
+----+            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 text-white">
+----+              <Crown className="w-12 h-12 mb-3" />
+----+              <h3 className="text-xl font-bold mb-2">Обновите до Premium</h3>
+----+              <p className="text-white/90 text-sm mb-4">
+----+                Получите безлимитные свайпы, супер лайки и видите, кто вас лайкнул!
+----+              </p>
+----+              <button
+----+                onClick={() => navigate('/premium')}
+----+                className="w-full bg-white text-purple-600 font-semibold py-3 rounded-full hover:bg-gray-100 transition-colors"
+----+              >
+----+                Узнать больше
+----+              </button>
+----+            </div>
+----+          </div>
+----+        )}
+----+
+----+        <div className="h-20" /> {/* Bottom spacing for nav */}
 ----+      </div>
 ----     </div>
 ----   );
 ---- };
 ----diff --git a/model.patch b/model.patch
-----index dd14c07..a6b919a 100644
+----index 559a6bd..61e26d0 100644
 ------- a/model.patch
 ----+++ b/model.patch
-----@@ -1,203 +0,0 @@
------diff --git a/frontend/src/pages/DiscoveryPage.jsx b/frontend/src/pages/DiscoveryPage.jsx
------index 1ae9fa5..ed04d89 100644
--------- a/frontend/src/pages/DiscoveryPage.jsx
------+++ b/frontend/src/pages/DiscoveryPage.jsx
------@@ -1,17 +1,187 @@
+----@@ -1,456 +0,0 @@
+-----diff --git a/frontend/src/pages/MatchesPage.jsx b/frontend/src/pages/MatchesPage.jsx
+-----index d67bd79..523da24 100644
+-------- a/frontend/src/pages/MatchesPage.jsx
+-----+++ b/frontend/src/pages/MatchesPage.jsx
+-----@@ -1,17 +1,232 @@
 ------import { motion } from 'framer-motion';
 -----+import { useState, useEffect } from 'react';
+-----+import { useNavigate } from 'react-router-dom';
 -----+import { useUserStore } from '../stores/userStore';
------+import SwipeCard from '../components/SwipeCard';
------+import { RefreshCw, Settings, Sparkles } from 'lucide-react';
------+import toast from 'react-hot-toast';
------+import Confetti from 'react-confetti';
+-----+import { MessageCircle, Heart, Clock, Star } from 'lucide-react';
+-----+import { formatDistanceToNow } from 'date-fns';
+-----+import { ru } from 'date-fns/locale';
 ----- 
------ const DiscoveryPage = () => {
------+  const { 
------+    discoveryCards, 
------+    currentCardIndex, 
------+    isLoadingCards,
------+    loadDiscoveryCards,
------+    swipeCard,
------+    getCurrentCard
------+  } = useUserStore();
------+
------+  const [swipeDirection, setSwipeDirection] = useState(null);
------+  const [showMatch, setShowMatch] = useState(false);
------+  const [matchedUser, setMatchedUser] = useState(null);
+----- const MatchesPage = () => {
+-----+  const navigate = useNavigate();
+-----+  const { matches, loadMatches, isLoadingMatches, receivedLikes, loadReceivedLikes } = useUserStore();
+-----+  const [activeTab, setActiveTab] = useState('matches'); // 'matches' or 'likes'
 -----+
 -----+  useEffect(() => {
------+    if (discoveryCards.length === 0 && !isLoadingCards) {
------+      loadDiscoveryCards(10);
------+    }
+-----+    loadMatches();
+-----+    loadReceivedLikes();
 -----+  }, []);
 -----+
------+  const handleSwipe = async (action) => {
------+    const currentCard = getCurrentCard();
------+    if (!currentCard) return;
------+
------+    // Trigger swipe animation
------+    setSwipeDirection(action === 'like' || action === 'super_like' ? 'right' : 'left');
------+
------+    // Wait for animation
------+    setTimeout(async () => {
------+      const result = await swipeCard(currentCard.id, action);
------+      
------+      if (result.success) {
------+        if (result.match) {
------+          // Show match modal
------+          setMatchedUser(currentCard);
------+          setShowMatch(true);
------+          toast.success('🎉 Это матч!');
------+        } else if (action === 'super_like') {
------+          toast.success('⭐ Super Like отправлен!');
------+        }
------+      } else {
------+        toast.error(result.error || 'Ошибка свайпа');
------+      }
------+      
------+      setSwipeDirection(null);
------+    }, 300);
+-----+  const formatTime = (timestamp) => {
+-----+    try {
+-----+      return formatDistanceToNow(new Date(timestamp), { 
+-----+        addSuffix: true, 
+-----+        locale: ru 
+-----+      });
+-----+    } catch {
+-----+      return '';
+-----+    }
 -----+  };
 -----+
------+  const currentCard = getCurrentCard();
------+  const remainingCards = discoveryCards.length - currentCardIndex;
------+
------+  if (isLoadingCards) {
+-----+  if (isLoadingMatches) {
 -----+    return (
------+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50">
+-----+      <div className="h-full flex items-center justify-center bg-gray-50">
 -----+        <div className="text-center">
------+          <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
------+          <p className="text-gray-600 font-medium">Загружаем профили...</p>
------+        </div>
------+      </div>
------+    );
------+  }
------+
------+  if (!currentCard || remainingCards === 0) {
------+    return (
------+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-6">
------+        <div className="text-center">
------+          <Sparkles className="w-20 h-20 text-pink-500 mx-auto mb-4" />
------+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
------+            Все профили просмотрены!
------+          </h2>
------+          <p className="text-gray-600 mb-6">
------+            Расширьте настройки поиска или зайдите позже
------+          </p>
------+          <button
------+            onClick={() => loadDiscoveryCards(10)}
------+            className="btn-primary inline-flex items-center gap-2"
------+          >
------+            <RefreshCw className="w-5 h-5" />
------+            Загрузить еще
------+          </button>
+-----+          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+-----+          <p className="text-gray-600">Загружаем совпадения...</p>
 -----+        </div>
 -----+      </div>
 -----+    );
@@ -1214,101 +925,407 @@ index 530a5ae..68090f0 100644
 ------        animate={{ scale: 1 }}
 ------        className="text-center p-6"
 ------      >
-------        <div className="text-6xl mb-4">❤️</div>
-------        <h2 className="text-2xl font-bold mb-2">Открытия</h2>
-------        <p className="text-gray-600">Свайпинг карточек</p>
+------        <div className="text-6xl mb-4">💬</div>
+------        <h2 className="text-2xl font-bold mb-2">Чаты</h2>
+------        <p className="text-gray-600">Ваши совпадения</p>
 ------      </motion.div>
------+    <div className="h-full bg-gradient-to-br from-pink-50 via-orange-50 to-red-50 relative overflow-hidden">
+-----+    <div className="h-full flex flex-col bg-gray-50">
 -----+      {/* Header */}
------+      <div className="absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between">
------+        <div className="flex items-center gap-2">
------+          <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md">
------+            <Sparkles className="w-5 h-5 text-pink-500" />
------+          </div>
------+          <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
------+            <span className="text-sm font-semibold text-gray-700">
------+              {remainingCards} профилей
------+            </span>
------+          </div>
+-----+      <div className="bg-white border-b border-gray-200">
+-----+        <div className="p-4">
+-----+          <h1 className="text-2xl font-bold text-gray-800">Совпадения</h1>
 -----+        </div>
------+        
------+        <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md">
------+          <Settings className="w-5 h-5 text-gray-700" />
------+        </button>
------+      </div>
 -----+
------+      {/* Cards Stack */}
------+      <div className="absolute inset-0 flex items-center justify-center p-4 pt-20 pb-28">
------+        <div className="relative w-full max-w-md h-full">
------+          {/* Next card preview */}
------+          {discoveryCards[currentCardIndex + 1] && (
------+            <div className="absolute inset-0 w-full h-full transform scale-95 opacity-50">
------+              <div className="w-full h-full bg-white rounded-3xl shadow-xl" />
+-----+        {/* Tabs */}
+-----+        <div className="flex border-b border-gray-200">
+-----+          <button
+-----+            onClick={() => setActiveTab('matches')}
+-----+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
+-----+              activeTab === 'matches'
+-----+                ? 'text-pink-600'
+-----+                : 'text-gray-500'
+-----+            }`}
+-----+          >
+-----+            <div className="flex items-center justify-center gap-2">
+-----+              <Heart className="w-4 h-4" />
+-----+              Матчи ({matches.length})
 -----+            </div>
------+          )}
------+
------+          {/* Current card */}
------+          <SwipeCard
------+            user={currentCard}
------+            onSwipe={handleSwipe}
------+            style={{
------+              transform: swipeDirection === 'right' 
------+                ? 'translateX(500px) rotate(30deg)' 
------+                : swipeDirection === 'left'
------+                ? 'translateX(-500px) rotate(-30deg)'
------+                : 'none',
------+              transition: swipeDirection ? 'transform 0.3s ease-out' : 'none',
------+              opacity: swipeDirection ? 0 : 1
------+            }}
------+          />
+-----+            {activeTab === 'matches' && (
+-----+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink-600" />
+-----+            )}
+-----+          </button>
+-----+          
+-----+          <button
+-----+            onClick={() => setActiveTab('likes')}
+-----+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
+-----+              activeTab === 'likes'
+-----+                ? 'text-pink-600'
+-----+                : 'text-gray-500'
+-----+            }`}
+-----+          >
+-----+            <div className="flex items-center justify-center gap-2">
+-----+              <Star className="w-4 h-4" />
+-----+              Лайки ({receivedLikes?.count || 0})
+-----+            </div>
+-----+            {activeTab === 'likes' && (
+-----+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink-600" />
+-----+            )}
+-----+          </button>
 -----+        </div>
 -----+      </div>
 -----+
------+      {/* Match Modal */}
------+      {showMatch && matchedUser && (
------+        <>
------+          <Confetti
------+            width={window.innerWidth}
------+            height={window.innerHeight}
------+            recycle={false}
------+            numberOfPieces={500}
------+          />
------+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6">
------+            <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-bounce-in">
------+              <h1 className="text-4xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
------+                Это матч! 🎉
------+              </h1>
------+              <div className="flex justify-center gap-4 mb-6">
------+                <img
------+                  src={matchedUser.photos?.[0] || '/placeholder-user.png'}
------+                  alt={matchedUser.full_name}
------+                  className="w-24 h-24 rounded-full object-cover border-4 border-pink-500"
------+                />
------+              </div>
+-----+      {/* Content */}
+-----+      <div className="flex-1 overflow-y-auto">
+-----+        {activeTab === 'matches' ? (
+-----+          matches.length === 0 ? (
+-----+            <div className="h-full flex flex-col items-center justify-center p-8 text-center">
+-----+              <Heart className="w-20 h-20 text-gray-300 mb-4" />
+-----+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+-----+                Пока нет совпадений
+-----+              </h3>
 -----+              <p className="text-gray-600 mb-6">
------+                Вы понравились друг другу! Начните общение прямо сейчас
+-----+                Начните свайпать, чтобы найти свои матчи!
 -----+              </p>
------+              <div className="space-y-3">
------+                <button
------+                  onClick={() => {
------+                    setShowMatch(false);
------+                    // Navigate to chat
------+                  }}
------+                  className="w-full btn-primary"
+-----+              <button
+-----+                onClick={() => navigate('/discovery')}
+-----+                className="btn-primary"
+-----+              >
+-----+                Начать поиск
+-----+              </button>
+-----+            </div>
+-----+          ) : (
+-----+            <div className="p-4 space-y-3">
+-----+              {matches.map((match) => (
+-----+                <div
+-----+                  key={match.match_id}
+-----+                  onClick={() => navigate(`/chat/${match.match_id}`)}
+-----+                  className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
 -----+                >
------+                  Написать сообщение
------+                </button>
+-----+                  <div className="flex items-center gap-4">
+-----+                    {/* Avatar */}
+-----+                    <div className="relative">
+-----+                      <img
+-----+                        src={match.matched_user?.photos?.[0] || '/placeholder-user.png'}
+-----+                        alt={match.matched_user?.full_name}
+-----+                        className="w-16 h-16 rounded-full object-cover"
+-----+                      />
+-----+                      {match.matched_user?.is_verified && (
+-----+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
+-----+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+-----+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+-----+                          </svg>
+-----+                        </div>
+-----+                      )}
+-----+                    </div>
+-----+
+-----+                    {/* Info */}
+-----+                    <div className="flex-1 min-w-0">
+-----+                      <h3 className="font-semibold text-gray-800 truncate">
+-----+                        {match.matched_user?.full_name}
+-----+                      </h3>
+-----+                      
+-----+                      {match.last_message ? (
+-----+                        <p className="text-sm text-gray-600 truncate">
+-----+                          {match.last_message.content}
+-----+                        </p>
+-----+                      ) : (
+-----+                        <p className="text-sm text-pink-500">
+-----+                          Новый матч! Напишите первым
+-----+                        </p>
+-----+                      )}
+-----+                      
+-----+                      <div className="flex items-center gap-2 mt-1">
+-----+                        <Clock className="w-3 h-3 text-gray-400" />
+-----+                        <span className="text-xs text-gray-400">
+-----+                          {formatTime(match.created_at)}
+-----+                        </span>
+-----+                      </div>
+-----+                    </div>
+-----+
+-----+                    {/* Message indicator */}
+-----+                    <div className="flex flex-col items-end gap-2">
+-----+                      <MessageCircle className="w-5 h-5 text-pink-500" />
+-----+                      {match.unread_count > 0 && (
+-----+                        <div className="w-5 h-5 bg-pink-500 rounded-full flex items-center justify-center">
+-----+                          <span className="text-xs text-white font-bold">
+-----+                            {match.unread_count > 9 ? '9+' : match.unread_count}
+-----+                          </span>
+-----+                        </div>
+-----+                      )}
+-----+                    </div>
+-----+                  </div>
+-----+                </div>
+-----+              ))}
+-----+            </div>
+-----+          )
+-----+        ) : (
+-----+          // Likes tab
+-----+          <div className="p-4">
+-----+            {receivedLikes?.premium_required ? (
+-----+              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white text-center">
+-----+                <Star className="w-16 h-16 mx-auto mb-4" fill="white" />
+-----+                <h3 className="text-xl font-bold mb-2">
+-----+                  {receivedLikes.count} {receivedLikes.count === 1 ? 'человек' : 'людей'} лайкнул вас!
+-----+                </h3>
+-----+                <p className="text-white/90 mb-4">
+-----+                  Обновитесь до Premium, чтобы увидеть, кто вас лайкнул
+-----+                </p>
 -----+                <button
------+                  onClick={() => setShowMatch(false)}
------+                  className="w-full btn-secondary"
+-----+                  onClick={() => navigate('/premium')}
+-----+                  className="bg-white text-purple-600 font-semibold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors"
 -----+                >
------+                  Продолжить свайпы
+-----+                  Перейти на Premium
 -----+                </button>
 -----+              </div>
------+            </div>
+-----+            ) : receivedLikes?.users && receivedLikes.users.length > 0 ? (
+-----+              <div className="grid grid-cols-2 gap-3">
+-----+                {receivedLikes.users.map((user) => (
+-----+                  <div
+-----+                    key={user.id}
+-----+                    className="bg-white rounded-2xl overflow-hidden shadow-sm"
+-----+                  >
+-----+                    <div className="aspect-square relative">
+-----+                      <img
+-----+                        src={user.photos?.[0] || '/placeholder-user.png'}
+-----+                        alt={user.full_name}
+-----+                        className="w-full h-full object-cover"
+-----+                      />
+-----+                      {user.is_super_like && (
+-----+                        <div className="absolute top-2 right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+-----+                          <Star className="w-5 h-5 text-white" fill="white" />
+-----+                        </div>
+-----+                      )}
+-----+                    </div>
+-----+                    <div className="p-3">
+-----+                      <h4 className="font-semibold text-sm truncate">
+-----+                        {user.full_name}, {user.age}
+-----+                      </h4>
+-----+                      {user.job_title && (
+-----+                        <p className="text-xs text-gray-600 truncate">
+-----+                          {user.job_title}
+-----+                        </p>
+-----+                      )}
+-----+                    </div>
+-----+                  </div>
+-----+                ))}
+-----+              </div>
+-----+            ) : (
+-----+              <div className="text-center py-12">
+-----+                <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+-----+                <p className="text-gray-600">Пока никто не лайкнул вас</p>
+-----+              </div>
+-----+            )}
 -----+          </div>
------+        </>
------+      )}
+-----+        )}
+-----+      </div>
 -----     </div>
 -----   );
 ----- };
+-----diff --git a/model.patch b/model.patch
+-----index dd14c07..a6b919a 100644
+-------- a/model.patch
+-----+++ b/model.patch
+-----@@ -1,203 +0,0 @@
+------diff --git a/frontend/src/pages/DiscoveryPage.jsx b/frontend/src/pages/DiscoveryPage.jsx
+------index 1ae9fa5..ed04d89 100644
+--------- a/frontend/src/pages/DiscoveryPage.jsx
+------+++ b/frontend/src/pages/DiscoveryPage.jsx
+------@@ -1,17 +1,187 @@
+-------import { motion } from 'framer-motion';
+------+import { useState, useEffect } from 'react';
+------+import { useUserStore } from '../stores/userStore';
+------+import SwipeCard from '../components/SwipeCard';
+------+import { RefreshCw, Settings, Sparkles } from 'lucide-react';
+------+import toast from 'react-hot-toast';
+------+import Confetti from 'react-confetti';
+------ 
+------ const DiscoveryPage = () => {
+------+  const { 
+------+    discoveryCards, 
+------+    currentCardIndex, 
+------+    isLoadingCards,
+------+    loadDiscoveryCards,
+------+    swipeCard,
+------+    getCurrentCard
+------+  } = useUserStore();
+------+
+------+  const [swipeDirection, setSwipeDirection] = useState(null);
+------+  const [showMatch, setShowMatch] = useState(false);
+------+  const [matchedUser, setMatchedUser] = useState(null);
+------+
+------+  useEffect(() => {
+------+    if (discoveryCards.length === 0 && !isLoadingCards) {
+------+      loadDiscoveryCards(10);
+------+    }
+------+  }, []);
+------+
+------+  const handleSwipe = async (action) => {
+------+    const currentCard = getCurrentCard();
+------+    if (!currentCard) return;
+------+
+------+    // Trigger swipe animation
+------+    setSwipeDirection(action === 'like' || action === 'super_like' ? 'right' : 'left');
+------+
+------+    // Wait for animation
+------+    setTimeout(async () => {
+------+      const result = await swipeCard(currentCard.id, action);
+------+      
+------+      if (result.success) {
+------+        if (result.match) {
+------+          // Show match modal
+------+          setMatchedUser(currentCard);
+------+          setShowMatch(true);
+------+          toast.success('🎉 Это матч!');
+------+        } else if (action === 'super_like') {
+------+          toast.success('⭐ Super Like отправлен!');
+------+        }
+------+      } else {
+------+        toast.error(result.error || 'Ошибка свайпа');
+------+      }
+------+      
+------+      setSwipeDirection(null);
+------+    }, 300);
+------+  };
+------+
+------+  const currentCard = getCurrentCard();
+------+  const remainingCards = discoveryCards.length - currentCardIndex;
+------+
+------+  if (isLoadingCards) {
+------+    return (
+------+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50">
+------+        <div className="text-center">
+------+          <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+------+          <p className="text-gray-600 font-medium">Загружаем профили...</p>
+------+        </div>
+------+      </div>
+------+    );
+------+  }
+------+
+------+  if (!currentCard || remainingCards === 0) {
+------+    return (
+------+      <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-orange-50 p-6">
+------+        <div className="text-center">
+------+          <Sparkles className="w-20 h-20 text-pink-500 mx-auto mb-4" />
+------+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+------+            Все профили просмотрены!
+------+          </h2>
+------+          <p className="text-gray-600 mb-6">
+------+            Расширьте настройки поиска или зайдите позже
+------+          </p>
+------+          <button
+------+            onClick={() => loadDiscoveryCards(10)}
+------+            className="btn-primary inline-flex items-center gap-2"
+------+          >
+------+            <RefreshCw className="w-5 h-5" />
+------+            Загрузить еще
+------+          </button>
+------+        </div>
+------+      </div>
+------+    );
+------+  }
+------+
+------   return (
+-------    <div className="h-full flex items-center justify-center bg-gray-50">
+-------      <motion.div
+-------        initial={{ scale: 0 }}
+-------        animate={{ scale: 1 }}
+-------        className="text-center p-6"
+-------      >
+-------        <div className="text-6xl mb-4">❤️</div>
+-------        <h2 className="text-2xl font-bold mb-2">Открытия</h2>
+-------        <p className="text-gray-600">Свайпинг карточек</p>
+-------      </motion.div>
+------+    <div className="h-full bg-gradient-to-br from-pink-50 via-orange-50 to-red-50 relative overflow-hidden">
+------+      {/* Header */}
+------+      <div className="absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between">
+------+        <div className="flex items-center gap-2">
+------+          <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md">
+------+            <Sparkles className="w-5 h-5 text-pink-500" />
+------+          </div>
+------+          <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
+------+            <span className="text-sm font-semibold text-gray-700">
+------+              {remainingCards} профилей
+------+            </span>
+------+          </div>
+------+        </div>
+------+        
+------+        <button className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md">
+------+          <Settings className="w-5 h-5 text-gray-700" />
+------+        </button>
+------+      </div>
+------+
+------+      {/* Cards Stack */}
+------+      <div className="absolute inset-0 flex items-center justify-center p-4 pt-20 pb-28">
+------+        <div className="relative w-full max-w-md h-full">
+------+          {/* Next card preview */}
+------+          {discoveryCards[currentCardIndex + 1] && (
+------+            <div className="absolute inset-0 w-full h-full transform scale-95 opacity-50">
+------+              <div className="w-full h-full bg-white rounded-3xl shadow-xl" />
+------+            </div>
+------+          )}
+------+
+------+          {/* Current card */}
+------+          <SwipeCard
+------+            user={currentCard}
+------+            onSwipe={handleSwipe}
+------+            style={{
+------+              transform: swipeDirection === 'right' 
+------+                ? 'translateX(500px) rotate(30deg)' 
+------+                : swipeDirection === 'left'
+------+                ? 'translateX(-500px) rotate(-30deg)'
+------+                : 'none',
+------+              transition: swipeDirection ? 'transform 0.3s ease-out' : 'none',
+------+              opacity: swipeDirection ? 0 : 1
+------+            }}
+------+          />
+------+        </div>
+------+      </div>
+------+
+------+      {/* Match Modal */}
+------+      {showMatch && matchedUser && (
+------+        <>
+------+          <Confetti
+------+            width={window.innerWidth}
+------+            height={window.innerHeight}
+------+            recycle={false}
+------+            numberOfPieces={500}
+------+          />
+------+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+------+            <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center animate-bounce-in">
+------+              <h1 className="text-4xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
+------+                Это матч! 🎉
+------+              </h1>
+------+              <div className="flex justify-center gap-4 mb-6">
+------+                <img
+------+                  src={matchedUser.photos?.[0] || '/placeholder-user.png'}
+------+                  alt={matchedUser.full_name}
+------+                  className="w-24 h-24 rounded-full object-cover border-4 border-pink-500"
+------+                />
+------+              </div>
+------+              <p className="text-gray-600 mb-6">
+------+                Вы понравились друг другу! Начните общение прямо сейчас
+------+              </p>
+------+              <div className="space-y-3">
+------+                <button
+------+                  onClick={() => {
+------+                    setShowMatch(false);
+------+                    // Navigate to chat
+------+                  }}
+------+                  className="w-full btn-primary"
+------+                >
+------+                  Написать сообщение
+------+                </button>
+------+                <button
+------+                  onClick={() => setShowMatch(false)}
+------+                  className="w-full btn-secondary"
+------+                >
+------+                  Продолжить свайпы
+------+                </button>
+------+              </div>
+------+            </div>
+------+          </div>
+------+        </>
+------+      )}
+------     </div>
+------   );
+------ };
