@@ -3,24 +3,17 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/index.css';
 
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(
-      (registration) => {
-        console.log('✅ Service Worker registered:', registration.scope);
-      },
-      (error) => {
-        console.log('❌ Service Worker registration failed:', error);
-      }
-    );
-  });
-}
+// Service Worker will be registered automatically by vite-plugin-pwa
 
-// Request notification permission
-if ('Notification' in window && Notification.permission === 'default') {
-  Notification.requestPermission();
-}
+// Request notification permission on user interaction
+const requestNotificationPermission = () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+};
+
+// Wait for user interaction before requesting permission
+document.addEventListener('click', requestNotificationPermission, { once: true });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
