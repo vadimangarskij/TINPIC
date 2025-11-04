@@ -81,7 +81,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="h-full max-w-md mx-auto bg-white shadow-2xl">
+      <div className="h-full w-full bg-white">
         <Routes>
           {/* Публичные маршруты */}
           {!user ? (
