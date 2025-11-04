@@ -91,14 +91,16 @@ Return ONLY a number between 0-100."""
         bio = matched_user_profile.get("bio", "")
         job = matched_user_profile.get("job_title", "")
         
-        if not self.client:
+        if not self.chat:
             # Fallback icebreakers
             if interests:
-                return f"I noticed you're into {interests[0]}! What got you interested in that?"
-            return "Hey! What's been the highlight of your week?"
+                return f"Заметил, что ты увлекаешься {interests[0]}! Что тебя в этом привлекло?"
+            return "Привет! Как прошла неделя?"
         
         try:
-            prompt = f"""Generate a friendly, natural conversation starter for a dating app match.
+            from emergentintegrations.llm.chat import UserMessage
+            
+            prompt = f"""Generate a friendly, natural conversation starter in Russian for a dating app match.
             
 Profile Info:
 - Interests: {', '.join(interests)}
@@ -107,20 +109,18 @@ Profile Info:
             
 Create ONE short, engaging question (max 15 words) that shows genuine interest.
 Be casual, friendly, and specific to their profile.
-Do not use emojis."""
+Do not use emojis. Response must be in Russian."""
             
-            response = self.client.chat_completion(
-                messages=[{"role": "user", "content": prompt}],
-                model="gpt-4",
-                max_tokens=50
-            )
+            message = UserMessage(text=prompt)
+            response = await self.chat.send_message(message)
             
-            icebreaker = response.get("choices", [{}])[0].get("message", {}).get("content", "")
-            return icebreaker.strip().strip('"')
-        except:
+            icebreaker = response.strip().strip('"')
+            return icebreaker
+        except Exception as e:
+            print(f"AI icebreaker error: {e}")
             if interests:
-                return f"I noticed you're into {interests[0]}! What got you interested in that?"
-            return "Hey! What's been the highlight of your week?"
+                return f"Заметил, что ты увлекаешься {interests[0]}! Что тебя в этом привлекло?"
+            return "Привет! Как прошла неделя?"
     
     async def moderate_content(self, content: str, content_type: str = "text") -> Dict:
         """Moderate user-generated content for inappropriate material"""
