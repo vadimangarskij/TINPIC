@@ -145,16 +145,97 @@ const HomePage = () => {
         </div>
       )}
 
+      {/* Online Users - Quick Match */}
+      <div className="px-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-800">Онлайн сейчас</h3>
+          <button
+            onClick={() => navigate('/discovery')}
+            className="text-sm text-pink-500 font-semibold"
+          >
+            Смотреть всех
+          </button>
+        </div>
+        
+        <div className="flex gap-3 overflow-x-auto pb-2">
+          {[1, 2, 3, 4, 5].map((_, idx) => (
+            <div
+              key={idx}
+              onClick={() => navigate('/discovery')}
+              className="flex-shrink-0 cursor-pointer"
+            >
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-orange-400 p-0.5">
+                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-2xl">👤</span>
+                </div>
+                <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full" />
+              </div>
+              <p className="text-xs text-center mt-1 text-gray-600">User {idx + 1}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Tips Section */}
       <div className="px-6 pb-8">
-        <div className="bg-white rounded-3xl p-6 shadow-md">
-          <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-pink-500" />
-            Совет дня
-          </h3>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Добавьте больше фотографий в свой профиль! Анкеты с 3+ фото получают на 40% больше совпадений 📸
-          </p>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Полезные советы</h3>
+        
+        <div className="space-y-3">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-pink-500">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-pink-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-800 mb-1">Добавьте больше фото</h4>
+                <p className="text-sm text-gray-600">
+                  Профили с 3+ фотографиями получают на 40% больше совпадений
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-blue-500">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-800 mb-1">Начинайте диалог</h4>
+                <p className="text-sm text-gray-600">
+                  Отправьте первое сообщение в течение 24 часов для лучших результатов
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-purple-500">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Star className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-800 mb-1">Используйте Super Like</h4>
+                <p className="text-sm text-gray-600">
+                  Super Likes увеличивают шанс совпадения в 3 раза!
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-green-500">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-800 mb-1">Заполните профиль</h4>
+                <p className="text-sm text-gray-600">
+                  Добавьте интересы и био - это увеличивает доверие на 60%
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
