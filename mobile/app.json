@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "ConnectSphere",
+    "slug": "connect-sphere",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF6B6B"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.connectsphere.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ConnectSphere needs your location to show you matches nearby.",
+        "NSPhotoLibraryUsageDescription": "ConnectSphere needs access to your photos to upload profile pictures.",
+        "NSCameraUsageDescription": "ConnectSphere needs access to your camera to take profile pictures."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF6B6B"
+      },
+      "package": "com.connectsphere.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow ConnectSphere to use your location to find matches nearby."
+        }
+      ]
+    ]
+  }
+}
