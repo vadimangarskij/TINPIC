@@ -67,18 +67,29 @@ async def register(user: UserCreate):
         if not supabase_admin:
             raise HTTPException(status_code=500, detail="Supabase not configured")
         
-        # Check if user exists
-        existing = supabase_admin.table("users").select("id").eq("email", user.email).execute()
-        if existing.data:
-            raise HTTPException(status_code=400, detail="Email already registered")
-        
-        # Check username
+        # Check if username exists
         existing_username = supabase_admin.table("users").select("id").eq("username", user.username).execute()
         if existing_username.data:
             raise HTTPException(status_code=400, detail="Username already taken")
         
-        # Hash password
-        hashed_password = get_password_hash(user.password)
+        # Create auth user in Supabase Auth (this will also check email uniqueness)
+        try:
+            auth_response = supabase_admin.auth.admin.create_user({
+                "email": user.email,
+                "password": user.password,
+                "email_confirm": True  # Auto-confirm email
+            })
+            
+            if not auth_response or not auth_response.user:
+                raise HTTPException(status_code=500, detail="Failed to create auth user")
+            
+            auth_user_id = auth_response.user.id
+            
+        except Exception as auth_error:
+            error_msg = str(auth_error)
+            if "already registered" in error_msg.lower() or "already exists" in error_msg.lower():
+                raise HTTPException(status_code=400, detail="Email already registered")
+            raise HTTPException(status_code=500, detail=f"Auth error: {error_msg}")
         
         # Calculate age from date_of_birth
         age = None
@@ -88,8 +99,9 @@ async def register(user: UserCreate):
                 (today.month, today.day) < (user.date_of_birth.month, user.date_of_birth.day)
             )
         
-        # Create user
+        # Create user profile in database with auth_user_id
         user_data = {
+            "id": auth_user_id,  # Use Supabase Auth user ID
             "email": user.email,
             "username": user.username,
             "full_name": user.full_name,
@@ -98,19 +110,32 @@ async def register(user: UserCreate):
             "gender": user.gender,
             "bio": user.bio,
             "phone": user.phone,
-            "is_approved": False,  # Requires admin approval
+            "is_approved": True,  # Auto-approve for now
             "coins": 100  # Welcome bonus
         }
         
         result = supabase_admin.table("users").insert(user_data).execute()
         
         if not result.data:
-            raise HTTPException(status_code=500, detail="Failed to create user")
+            # Rollback: delete auth user if profile creation failed
+            try:
+                supabase_admin.auth.admin.delete_user(auth_user_id)
+            except:
+                pass
+            raise HTTPException(status_code=500, detail="Failed to create user profile")
         
-        user_id = result.data[0]["id"]
-        
-        # Create access token
-        access_token = create_access_token(data={"sub": user_id})
+        # Create access token using JWT from Supabase
+        # Sign in the user to get session
+        try:
+            sign_in_response = supabase.auth.sign_in_with_password({
+                "email": user.email,
+                "password": user.password
+            })
+            
+            access_token = sign_in_response.session.access_token if sign_in_response.session else None
+        except:
+            # Fallback to custom JWT
+            access_token = create_access_token(data={"sub": auth_user_id})
         
         return {
             "access_token": access_token,
@@ -122,7 +147,9 @@ async def register(user: UserCreate):
         raise
     except Exception as e:
         print(f"Registration error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @app.post("/api/auth/login")
 async def login(credentials: UserLogin):
