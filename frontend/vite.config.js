@@ -68,10 +68,20 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
-    host: true
+    host: true,
+    allowedHosts: [
+      'localhost',
+      '.preview.emergentagent.com',
+      'geomeet-app-1.preview.emergentagent.com'
+    ]
   },
   preview: {
     port: 3000,
-    host: true
+    host: true,
+    allowedHosts: [
+      'localhost',
+      '.preview.emergentagent.com',
+      'geomeet-app-1.preview.emergentagent.com'
+    ]
   }
 });
