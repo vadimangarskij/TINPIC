@@ -58,6 +58,8 @@ class AIService:
                                         common_interests: List[str]) -> int:
         """Use AI to analyze compatibility based on bios"""
         try:
+            from emergentintegrations.llm.chat import UserMessage
+            
             prompt = f"""Analyze compatibility between two dating app users based on their bios and common interests.
             
 User 1 Bio: {bio1}
@@ -72,16 +74,14 @@ Provide a compatibility score from 0-100 considering:
             
 Return ONLY a number between 0-100."""
             
-            response = self.client.chat_completion(
-                messages=[{"role": "user", "content": prompt}],
-                model="gpt-4",
-                max_tokens=10
-            )
+            message = UserMessage(text=prompt)
+            response = await self.chat.send_message(message)
             
-            score_text = response.get("choices", [{}])[0].get("message", {}).get("content", "50")
+            score_text = response
             score = int(''.join(filter(str.isdigit, score_text)))
             return max(0, min(100, score))
-        except:
+        except Exception as e:
+            print(f"AI compatibility error: {e}")
             return 50  # Default moderate compatibility
     
     async def generate_icebreaker(self, matched_user_profile: Dict) -> str:
