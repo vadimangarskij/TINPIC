@@ -224,6 +224,15 @@ const DiscoveryPage = () => {
           </div>
         </>
       )}
+      
+      {/* Profile Modal */}
+      {showProfileModal && selectedUser && (
+        <UserProfileModal
+          user={selectedUser}
+          onClose={() => setShowProfileModal(false)}
+          onSwipe={handleSwipe}
+        />
+      )}
     </div>
   );
 };
