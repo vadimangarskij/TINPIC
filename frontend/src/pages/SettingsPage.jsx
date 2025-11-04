@@ -16,7 +16,7 @@ const SettingsPage = () => {
   };
 
   const settings = [
-    { icon: User, label: 'Редактировать профиль', path: '/profile', color: 'text-blue-500' },
+    { icon: User, label: 'Редактировать профиль', path: '/settings/edit-profile', color: 'text-blue-500' },
     { icon: Bell, label: 'Уведомления', path: '/settings/notifications', color: 'text-purple-500' },
     { icon: Shield, label: 'Приватность и безопасность', path: '/settings/privacy', color: 'text-green-500' },
     { icon: CreditCard, label: 'Подписка и платежи', path: '/premium', color: 'text-orange-500' },
