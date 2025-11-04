@@ -42,12 +42,14 @@ const RegisterPage = () => {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
+        className="flex flex-col items-center"
       >
-        <h1 className="text-4xl font-bold mb-2">Создать</h1>
-        <h1 className="text-4xl font-bold mb-2">аккаунт</h1>
-        <p className="text-lg opacity-90 mb-8">
-          Начните свой путь к любви
-        </p>
+        <div className="w-full max-w-md text-center mb-8">
+          <h1 className="text-4xl font-bold mb-3">Создать аккаунт</h1>
+          <p className="text-lg opacity-90">
+            Начните свой путь к любви
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="glass rounded-2xl p-4 flex items-center space-x-3">
