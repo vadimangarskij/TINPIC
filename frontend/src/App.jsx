@@ -187,6 +187,14 @@ function App() {
                   </div>
                 }
               />
+              <Route
+                path="/settings/edit-profile"
+                element={
+                  <div className="h-full">
+                    <EditProfilePage />
+                  </div>
+                }
+              />
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           )}
