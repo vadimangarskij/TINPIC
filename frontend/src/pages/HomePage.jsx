@@ -1,42 +1,164 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Heart, MapPin, Crown } from 'lucide-react';
+import { Heart, MessageCircle, Sparkles, TrendingUp, User, Star, Eye, Zap } from 'lucide-react';
+import { useAuthStore } from '../stores/authStore';
+import { useUserStore } from '../stores/userStore';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const { matches, loadMatches, receivedLikes, loadReceivedLikes } = useUserStore();
+  const [greeting, setGreeting] = useState('');
+
+  useEffect(() => {
+    // Set greeting based on time
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Доброе утро');
+    else if (hour < 18) setGreeting('Добрый день');
+    else setGreeting('Добрый вечер');
+
+    // Load data
+    loadMatches();
+    loadReceivedLikes();
+  }, []);
+
+  const stats = [
+    { icon: Eye, label: 'Просмотры', value: user?.profile_views || 0, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { icon: Heart, label: 'Лайки', value: user?.total_likes_received || 0, color: 'text-pink-500', bg: 'bg-pink-50' },
+    { icon: Star, label: 'Super Likes', value: user?.total_super_likes_received || 0, color: 'text-purple-500', bg: 'bg-purple-50' },
+    { icon: MessageCircle, label: 'Матчи', value: matches.length, color: 'text-green-500', bg: 'bg-green-50' },
+  ];
+
+  const quickActions = [
+    { 
+      icon: Zap, 
+      label: 'Начать поиск', 
+      subtitle: 'Найди свою пару',
+      path: '/discovery', 
+      gradient: 'from-pink-500 to-red-500' 
+    },
+    { 
+      icon: MessageCircle, 
+      label: 'Сообщения', 
+      subtitle: `${matches.length} совпадений`,
+      path: '/matches', 
+      gradient: 'from-purple-500 to-pink-500',
+      badge: matches.filter(m => m.unread_count > 0).length 
+    },
+    { 
+      icon: User, 
+      label: 'Мой профиль', 
+      subtitle: 'Редактировать',
+      path: '/profile', 
+      gradient: 'from-blue-500 to-cyan-500' 
+    },
+    { 
+      icon: Sparkles, 
+      label: 'Premium', 
+      subtitle: 'Больше возможностей',
+      path: '/premium', 
+      gradient: 'from-yellow-500 to-orange-500',
+      premium: true
+    },
+  ];
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-red-50 p-6">
-      <h1 className="text-3xl font-bold mb-6">Главная</h1>
-      
-      <div className="space-y-4">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/discovery')}
-          className="w-full p-6 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-3xl shadow-xl"
-        >
-          <Heart className="w-8 h-8 mx-auto mb-2" />
-          <div className="font-bold text-lg">Начать знакомства</div>
-        </motion.button>
+    <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+      {/* Header */}
+      <div className="p-6 pb-0">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">
+            {greeting}, {user?.full_name?.split(' ')[0] || 'друг'}! 👋
+          </h1>
+          <p className="text-gray-600">Готовы найти свою любовь сегодня?</p>
+        </div>
 
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/places')}
-          className="w-full p-6 bg-white rounded-3xl shadow-xl"
-        >
-          <MapPin className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-          <div className="font-bold text-lg">Куда сходить</div>
-        </motion.button>
-
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/premium')}
-          className="w-full p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-3xl shadow-xl"
-        >
-          <Crown className="w-8 h-8 mx-auto mb-2" />
-          <div className="font-bold text-lg">Premium</div>
-        </motion.button>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          {stats.map((stat, idx) => (
+            <div
+              key={idx}
+              className={`${stat.bg} rounded-2xl p-3 text-center`}
+            >
+              <stat.icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
+              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-xs text-gray-600 truncate">{stat.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Quick Actions */}
+      <div className="px-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-4">Быстрые действия</h2>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {quickActions.map((action, index) => (
+            <button
+              key={index}
+              onClick={() => navigate(action.path)}
+              className="relative group"
+            >
+              <div className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 text-white shadow-lg hover:shadow-xl transition-all group-hover:scale-[1.02] active:scale-[0.98]`}>
+                {action.badge > 0 && (
+                  <div className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
+                    <span className="text-xs font-bold">{action.badge}</span>
+                  </div>
+                )}
+                {action.premium && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-yellow-400 rounded-full p-1">
+                      <Sparkles className="w-3 h-3 text-white" fill="white" />
+                    </div>
+                  </div>
+                )}
+                <action.icon className="w-10 h-10 mb-3" strokeWidth={2} />
+                <p className="font-bold text-base mb-0.5">{action.label}</p>
+                <p className="text-xs text-white/80">{action.subtitle}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Received Likes Preview */}
+      {receivedLikes?.count > 0 && (
+        <div className="px-6 mb-6">
+          <div 
+            onClick={() => navigate('/matches')}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h3 className="text-xl font-bold mb-1">
+                  {receivedLikes.count} {receivedLikes.count === 1 ? 'человек' : 'людей'} лайкнул вас!
+                </h3>
+                <p className="text-white/90 text-sm">
+                  {receivedLikes.premium_required 
+                    ? 'Обновитесь до Premium, чтобы увидеть'
+                    : 'Посмотрите, кто вас лайкнул'
+                  }
+                </p>
+              </div>
+              <Star className="w-12 h-12" fill="white" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tips Section */}
+      <div className="px-6 pb-8">
+        <div className="bg-white rounded-3xl p-6 shadow-md">
+          <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-pink-500" />
+            Совет дня
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Добавьте больше фотографий в свой профиль! Анкеты с 3+ фото получают на 40% больше совпадений 📸
+          </p>
+        </div>
+      </div>
+
+      <div className="h-20" /> {/* Bottom spacing for nav */}
     </div>
   );
 };
