@@ -55,6 +55,14 @@ const DiscoveryPage = () => {
       setSwipeDirection(null);
     }, 300);
   };
+  
+  const handleShowProfile = () => {
+    const currentCard = getCurrentCard();
+    if (currentCard) {
+      setSelectedUser(currentCard);
+      setShowProfileModal(true);
+    }
+  };
 
   const currentCard = getCurrentCard();
   const remainingCards = discoveryCards.length - currentCardIndex;
