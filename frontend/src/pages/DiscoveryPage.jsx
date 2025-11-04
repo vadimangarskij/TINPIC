@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useUserStore } from '../stores/userStore';
 import SwipeCard from '../components/SwipeCard';
-import { RefreshCw, Settings, Sparkles } from 'lucide-react';
+import UserProfileModal from '../components/UserProfileModal';
+import { RefreshCw, Settings, Sparkles, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Confetti from 'react-confetti';
 
