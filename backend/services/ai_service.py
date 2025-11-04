@@ -1,20 +1,28 @@
 import os
 import json
 from typing import List, Dict, Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class AIService:
     def __init__(self):
         self.llm_key = os.getenv("EMERGENT_LLM_KEY")
-        self.client = None
+        self.chat = None
         
         # Initialize LLM client if key is available
         if self.llm_key:
             try:
-                from emergentintegrations import LLMClient
-                self.client = LLMClient(api_key=self.llm_key)
-                print("✅ AI Service initialized with Emergent LLM")
+                from emergentintegrations.llm.chat import LlmChat
+                # Initialize with default system message
+                self.chat = LlmChat(
+                    api_key=self.llm_key,
+                    session_id="dating-app-ai",
+                    system_message="You are a helpful AI assistant for a dating app. Provide friendly, engaging, and appropriate responses."
+                ).with_model("openai", "gpt-4o-mini")
+                print("✅ AI Service initialized with Emergent LLM (gpt-4o-mini)")
             except Exception as e:
-                print(f"⚠️ AI Service: {e}")
+                print(f"⚠️ AI Service initialization error: {e}")
     
     async def calculate_compatibility(self, user1_interests: List[str], user2_interests: List[str], 
                                      user1_bio: str = "", user2_bio: str = "") -> int:
