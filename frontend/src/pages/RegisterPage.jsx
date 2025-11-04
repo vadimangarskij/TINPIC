@@ -51,7 +51,7 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
           <div className="glass rounded-2xl p-4 flex items-center space-x-3">
             <Mail className="w-5 h-5" />
             <input
