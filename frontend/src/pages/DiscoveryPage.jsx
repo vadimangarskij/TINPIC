@@ -19,6 +19,8 @@ const DiscoveryPage = () => {
   const [swipeDirection, setSwipeDirection] = useState(null);
   const [showMatch, setShowMatch] = useState(false);
   const [matchedUser, setMatchedUser] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     if (discoveryCards.length === 0 && !isLoadingCards) {
