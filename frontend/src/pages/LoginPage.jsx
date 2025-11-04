@@ -36,13 +36,14 @@ const LoginPage = () => {
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="flex-1"
+        className="flex-1 flex flex-col items-center justify-center"
       >
-        <h1 className="text-4xl font-bold mb-2">Добро</h1>
-        <h1 className="text-4xl font-bold mb-2">пожаловать!</h1>
-        <p className="text-lg opacity-90 mb-8">
-          Войдите в свой аккаунт
-        </p>
+        <div className="w-full max-w-md text-center mb-8">
+          <h1 className="text-4xl font-bold mb-3">Добро пожаловать!</h1>
+          <p className="text-lg opacity-90">
+            Войдите в свой аккаунт
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="glass rounded-2xl p-4 flex items-center space-x-3">
