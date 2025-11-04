@@ -53,7 +53,7 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "supabase_connected": supabase is not None,
-        "ai_service_ready": ai_service.client is not None
+        "ai_service_ready": ai_service.chat is not None
     }
 
 # ============================================
