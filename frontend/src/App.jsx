@@ -17,6 +17,7 @@ import PlacesPage from './pages/PlacesPage';
 import PremiumPage from './pages/PremiumPage';
 import SettingsPage from './pages/SettingsPage';
 import FeaturesPage from './pages/FeaturesPage';
+import EditProfilePage from './pages/EditProfilePage';
 
 // Components
 import BottomNav from './components/BottomNav';
