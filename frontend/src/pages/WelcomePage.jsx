@@ -89,6 +89,12 @@ const WelcomePage = () => {
         >
           Уже есть аккаунт
         </button>
+        <button
+          onClick={() => navigate('/features')}
+          className="w-full py-3 bg-transparent border-2 border-white/50 rounded-2xl font-medium text-sm hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
+        >
+          Узнать больше о возможностях
+        </button>
       </motion.div>
 
       {/* Bottom safe area */}
