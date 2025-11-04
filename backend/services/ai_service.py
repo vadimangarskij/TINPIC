@@ -125,13 +125,15 @@ Do not use emojis. Response must be in Russian."""
     async def moderate_content(self, content: str, content_type: str = "text") -> Dict:
         """Moderate user-generated content for inappropriate material"""
         
-        if not self.client:
+        if not self.chat:
             # Basic keyword filtering
             inappropriate_keywords = ["spam", "scam", "fake", "bot"]
             is_flagged = any(keyword in content.lower() for keyword in inappropriate_keywords)
             return {"is_safe": not is_flagged, "reason": "keyword_filter"}
         
         try:
+            from emergentintegrations.llm.chat import UserMessage
+            
             prompt = f"""Analyze this {content_type} for dating app safety.
             
 Content: {content}
@@ -145,16 +147,13 @@ Check for:
             
 Respond with JSON: {{"is_safe": true/false, "reason": "description"}}"""
             
-            response = self.client.chat_completion(
-                messages=[{"role": "user", "content": prompt}],
-                model="gpt-4",
-                max_tokens=100
-            )
+            message = UserMessage(text=prompt)
+            response = await self.chat.send_message(message)
             
-            result_text = response.get("choices", [{}])[0].get("message", {}).get("content", "")
-            result = json.loads(result_text)
+            result = json.loads(response)
             return result
-        except:
+        except Exception as e:
+            print(f"AI moderation error: {e}")
             return {"is_safe": True, "reason": "moderation_unavailable"}
 
 # Global AI service instance
