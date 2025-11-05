@@ -267,6 +267,144 @@ async def update_preferences(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/users/photos/upload")
+async def upload_photo(
+    file: UploadFile = File(...),
+    current_user_id: str = Depends(get_current_user)
+):
+    """Upload user photo to Supabase Storage"""
+    try:
+        # Validate file type
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
+        if file.content_type not in allowed_types:
+            raise HTTPException(status_code=400, detail="Invalid file type. Only JPEG, PNG, and WebP are allowed.")
+        
+        # Validate file size (max 5MB)
+        contents = await file.read()
+        if len(contents) > 5 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File size too large. Maximum 5MB allowed.")
+        
+        # Generate unique filename
+        import uuid
+        file_ext = file.filename.split('.')[-1]
+        unique_filename = f"{current_user_id}/{uuid.uuid4()}.{file_ext}"
+        
+        # Upload to Supabase Storage
+        try:
+            # Upload file
+            storage_response = supabase_admin.storage.from_('user-photos').upload(
+                unique_filename,
+                contents,
+                {'content-type': file.content_type}
+            )
+            
+            # Get public URL
+            public_url = supabase_admin.storage.from_('user-photos').get_public_url(unique_filename)
+            
+            # Update user's photos array
+            user_result = supabase_admin.table("users").select("photos").eq("id", current_user_id).execute()
+            current_photos = user_result.data[0].get("photos", []) if user_result.data else []
+            
+            # Check photo limit (6 for premium, 3 for regular)
+            user_data = supabase_admin.table("users").select("is_premium").eq("id", current_user_id).execute()
+            is_premium = user_data.data[0].get("is_premium", False) if user_data.data else False
+            max_photos = 6 if is_premium else 3
+            
+            if len(current_photos) >= max_photos:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Maximum {max_photos} photos allowed. {'Upgrade to Premium for more!' if not is_premium else ''}"
+                )
+            
+            # Add new photo
+            updated_photos = current_photos + [public_url]
+            supabase_admin.table("users").update({"photos": updated_photos}).eq("id", current_user_id).execute()
+            
+            return {
+                "success": True,
+                "photo_url": public_url,
+                "photos": updated_photos
+            }
+            
+        except Exception as storage_error:
+            print(f"Storage error: {storage_error}")
+            raise HTTPException(status_code=500, detail=f"Failed to upload to storage: {str(storage_error)}")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Upload photo error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/users/photos/{photo_index}")
+async def delete_photo(
+    photo_index: int,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Delete a user photo"""
+    try:
+        # Get current photos
+        user_result = supabase_admin.table("users").select("photos").eq("id", current_user_id).execute()
+        current_photos = user_result.data[0].get("photos", []) if user_result.data else []
+        
+        if photo_index < 0 or photo_index >= len(current_photos):
+            raise HTTPException(status_code=400, detail="Invalid photo index")
+        
+        # Remove photo from array
+        photo_url = current_photos[photo_index]
+        updated_photos = [p for i, p in enumerate(current_photos) if i != photo_index]
+        
+        # Update database
+        supabase_admin.table("users").update({"photos": updated_photos}).eq("id", current_user_id).execute()
+        
+        # TODO: Delete from Supabase Storage (optional - keeps old photos in storage)
+        
+        return {
+            "success": True,
+            "photos": updated_photos
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Delete photo error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/users/photos/reorder")
+async def reorder_photos(
+    photo_order: List[int],
+    current_user_id: str = Depends(get_current_user)
+):
+    """Reorder user photos"""
+    try:
+        # Get current photos
+        user_result = supabase_admin.table("users").select("photos").eq("id", current_user_id).execute()
+        current_photos = user_result.data[0].get("photos", []) if user_result.data else []
+        
+        # Validate photo_order
+        if len(photo_order) != len(current_photos):
+            raise HTTPException(status_code=400, detail="Invalid photo order length")
+        
+        if sorted(photo_order) != list(range(len(current_photos))):
+            raise HTTPException(status_code=400, detail="Invalid photo order indices")
+        
+        # Reorder photos
+        reordered_photos = [current_photos[i] for i in photo_order]
+        
+        # Update database
+        supabase_admin.table("users").update({"photos": reordered_photos}).eq("id", current_user_id).execute()
+        
+        return {
+            "success": True,
+            "photos": reordered_photos
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Reorder photos error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/users/{user_id}")
 async def get_user_profile(
     user_id: str,
