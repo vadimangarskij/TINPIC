@@ -67,12 +67,36 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Main info card */}
-        <div className="px-4 -mt-20 relative z-10">
+        {/* Main info card with ProfileFrame */}
+        <div className="px-4 -mt-32 relative z-10 flex justify-center">
+          <div className="relative mb-4">
+            <ProfileFrame frameType={user?.premium_frame || 'none'} size="xl">
+              <img
+                src={user?.photos?.[0] || `https://ui-avatars.com/api/?name=${user?.full_name || 'User'}&size=160&background=gradient&color=fff`}
+                alt="Profile"
+                className="w-40 h-40 object-cover"
+              />
+            </ProfileFrame>
+            {user?.is_premium && user?.premium_badge && (
+              <PremiumBadge type={user.premium_badge} position="top-right" animated={true} />
+            )}
+            {user?.is_premium && (
+              <button
+                onClick={() => navigate('/premium/customize')}
+                className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-xs font-semibold hover:shadow-lg transition-all flex items-center gap-1"
+              >
+                <Sparkles className="w-3 h-3" />
+                Кастомизация
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="px-4">
           <div className="bg-white rounded-3xl p-6 shadow-xl">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 justify-center">
                   <h1 className="text-2xl font-bold text-gray-800">
                     {user?.full_name || 'Без имени'}, {user?.age || '?'}
                   </h1>
