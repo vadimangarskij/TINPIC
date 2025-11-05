@@ -18,6 +18,9 @@ import PremiumPage from './pages/PremiumPage';
 import SettingsPage from './pages/SettingsPage';
 import FeaturesPage from './pages/FeaturesPage';
 import EditProfilePage from './pages/EditProfilePage';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUsersPage from './pages/AdminUsersPage';
+import AdminPaymentSettingsPage from './pages/AdminPaymentSettingsPage';
 
 // Components
 import BottomNav from './components/BottomNav';
