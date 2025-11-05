@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, MapPin, Briefcase, Heart, Star, MessageCircle, Share2, Flag } from 'lucide-react';
+import PremiumBadge from './PremiumBadge';
 
 const UserProfileModal = ({ user, onClose, onSwipe }) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
