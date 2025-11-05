@@ -111,9 +111,9 @@ const UserProfileModal = ({ user, onClose, onSwipe }) => {
                     </svg>
                   </div>
                 )}
-                {user.is_premium && (
-                  <div className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full">
-                    <span className="text-xs font-bold text-white">PREMIUM</span>
+                {user.is_premium && user.premium_badge && (
+                  <div className="transform scale-90">
+                    <PremiumBadge type={user.premium_badge} position="inline" animated={true} />
                   </div>
                 )}
               </div>
