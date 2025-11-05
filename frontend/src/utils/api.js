@@ -57,6 +57,15 @@ export const usersAPI = {
   updateProfile: (updates) => api.put('/users/me', updates),
   updateLocation: (location) => api.post('/users/location', location),
   updatePreferences: (preferences) => api.put('/users/preferences', preferences),
+  uploadPhoto: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/users/photos/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deletePhoto: (photoIndex) => api.delete(`/users/photos/${photoIndex}`),
+  reorderPhotos: (photoOrder) => api.put('/users/photos/reorder', { photo_order: photoOrder }),
 };
 
 // Discovery
