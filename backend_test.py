@@ -345,12 +345,14 @@ def test_settings_persistence(auth_headers):
     
     print_info(f"Saving setting: {unique_key} = {unique_value}")
     
-    # Save the setting
-    save_data = {"setting_key": unique_key, "setting_value": unique_value}
-    response = make_request('POST', '/admin/settings', headers=auth_headers, data=save_data)
+    # Save the setting using query parameters
+    params = {"setting_key": unique_key, "setting_value": unique_value}
+    response = make_request('POST', '/admin/settings', headers=auth_headers, params=params)
     
     if response is None or response.status_code != 200:
         print_error("Failed to save test setting")
+        if response:
+            print_error(f"Response: {response.text}")
         return False
     
     print_success("Test setting saved")
