@@ -33,30 +33,29 @@ const EditProfilePage = () => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
     
-    if (photos.length + files.length > 6) {
-      toast.error('Максимум 6 фотографий');
+    const max_photos = user?.is_premium ? 6 : 3;
+    if (photos.length + files.length > max_photos) {
+      toast.error(`Максимум ${max_photos} фотографий${!user?.is_premium ? '. Обновитесь до Premium для больше!' : ''}`);
       return;
     }
 
     setIsUploading(true);
     
     try {
-      // Convert to base64 for now (in production, upload to Supabase Storage)
-      const newPhotos = await Promise.all(
-        files.map(file => {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-        })
-      );
+      // Upload to Supabase Storage via API
+      const { usersAPI } = await import('../utils/api');
       
-      setPhotos([...photos, ...newPhotos]);
+      const uploadPromises = files.map(async (file) => {
+        const response = await usersAPI.uploadPhoto(file);
+        return response.data.photo_url;
+      });
+      
+      const uploadedUrls = await Promise.all(uploadPromises);
+      setPhotos([...photos, ...uploadedUrls]);
       toast.success('Фото загружены!');
     } catch (error) {
-      toast.error('Ошибка загрузки фото');
+      console.error('Photo upload error:', error);
+      toast.error(error.response?.data?.detail || 'Ошибка загрузки фото');
     } finally {
       setIsUploading(false);
     }
