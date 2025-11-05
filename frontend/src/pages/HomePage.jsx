@@ -159,20 +159,33 @@ const HomePage = () => {
           </button>
         </div>
         
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {[1, 2, 3, 4, 5].map((_, idx) => (
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {[
+            { name: 'Анна', frame: 'gold', badge: 'vip' },
+            { name: 'Дмитрий', frame: 'diamond', badge: 'elite' },
+            { name: 'Мария', frame: 'fire', badge: 'hot' },
+            { name: 'Иван', frame: 'neon', badge: 'featured' },
+            { name: 'София', frame: 'rainbow', badge: 'premium' },
+          ].map((mockUser, idx) => (
             <div
               key={idx}
               onClick={() => navigate('/discovery')}
-              className="flex-shrink-0 cursor-pointer"
+              className="flex-shrink-0 cursor-pointer group"
             >
-              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-pink-400 to-orange-400 p-0.5">
-                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-2xl">👤</span>
+              <div className="relative">
+                <ProfileFrame frameType={mockUser.frame} size="md">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-300 to-orange-300 flex items-center justify-center">
+                    <span className="text-3xl">👤</span>
+                  </div>
+                </ProfileFrame>
+                <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 transform scale-75">
+                  <PremiumBadge type={mockUser.badge} position="inline" animated={false} />
                 </div>
-                <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full" />
               </div>
-              <p className="text-xs text-center mt-1 text-gray-600">User {idx + 1}</p>
+              <p className="text-xs text-center mt-2 text-gray-700 font-medium group-hover:text-pink-500 transition-colors">
+                {mockUser.name}
+              </p>
             </div>
           ))}
         </div>
