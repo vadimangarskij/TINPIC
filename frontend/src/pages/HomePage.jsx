@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, Sparkles, TrendingUp, User, Star, Eye, Zap } from 'lucide-react';
+import { Heart, MessageCircle, Sparkles, TrendingUp, User, Star, Eye, Zap, Lightbulb, Users, TrendingUp as Boost } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { useUserStore } from '../stores/userStore';
+import ProfileFrame from '../components/ProfileFrame';
+import PremiumBadge from '../components/PremiumBadge';
 
 const HomePage = () => {
   const navigate = useNavigate();
