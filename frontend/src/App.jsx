@@ -21,6 +21,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminPaymentSettingsPage from './pages/AdminPaymentSettingsPage';
+import PremiumCustomizationPage from './pages/PremiumCustomizationPage';
 
 // Components
 import BottomNav from './components/BottomNav';
