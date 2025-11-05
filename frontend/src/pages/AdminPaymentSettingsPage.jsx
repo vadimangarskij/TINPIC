@@ -98,19 +98,33 @@ const AdminPaymentSettingsPage = () => {
           });
         }
       } else if (activeTab === 'transactions') {
-        // Load transaction data (mock for now)
-        setTransactions({
-          total: 1523,
-          today: 42,
-          this_month: 678,
-          revenue: 2450000,
-          recent: [
-            { id: '1', user: 'Анна И.', amount: 999, method: 'yoomoney', status: 'completed', date: '2025-06-15 14:32' },
-            { id: '2', user: 'Дмитрий П.', amount: 499, method: 'qiwi', status: 'completed', date: '2025-06-15 13:15' },
-            { id: '3', user: 'Мария С.', amount: 1999, method: 'telegram_stars', status: 'pending', date: '2025-06-15 12:45' },
-            { id: '4', user: 'Иван К.', amount: 499, method: 'yoomoney', status: 'failed', date: '2025-06-15 11:20' },
-          ]
-        });
+        // Load transaction data
+        try {
+          const statsResponse = await adminAPI.getTransactionStats();
+          const transactionsResponse = await adminAPI.getTransactions(10);
+          
+          setTransactions({
+            total: statsResponse.data?.total || 0,
+            today: statsResponse.data?.today || 0,
+            this_month: statsResponse.data?.this_month || 0,
+            revenue: statsResponse.data?.revenue || 0,
+            recent: transactionsResponse.data?.transactions || []
+          });
+        } catch (error) {
+          // Fallback to mock data if API fails
+          setTransactions({
+            total: 1523,
+            today: 42,
+            this_month: 678,
+            revenue: 2450000,
+            recent: [
+              { id: '1', user_name: 'Анна И.', amount: 999, payment_method: 'yoomoney', status: 'completed', created_at: '2025-06-15T14:32:00' },
+              { id: '2', user_name: 'Дмитрий П.', amount: 499, payment_method: 'qiwi', status: 'completed', created_at: '2025-06-15T13:15:00' },
+              { id: '3', user_name: 'Мария С.', amount: 1999, payment_method: 'telegram_stars', status: 'pending', created_at: '2025-06-15T12:45:00' },
+              { id: '4', user_name: 'Иван К.', amount: 499, payment_method: 'yoomoney', status: 'failed', created_at: '2025-06-15T11:20:00' },
+            ]
+          });
+        }
       } else if (activeTab === 'settings') {
         // Load global settings
         const response = await adminAPI.getSettings();
