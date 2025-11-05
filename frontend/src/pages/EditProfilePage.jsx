@@ -61,8 +61,16 @@ const EditProfilePage = () => {
     }
   };
 
-  const removePhoto = (index) => {
-    setPhotos(photos.filter((_, i) => i !== index));
+  const removePhoto = async (index) => {
+    try {
+      const { usersAPI } = await import('../utils/api');
+      const response = await usersAPI.deletePhoto(index);
+      setPhotos(response.data.photos);
+      toast.success('Фото удалено');
+    } catch (error) {
+      console.error('Photo delete error:', error);
+      toast.error('Ошибка удаления фото');
+    }
   };
 
   const addInterest = () => {
