@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Heart, X, Star, MapPin } from 'lucide-react';
+import PremiumBadge from './PremiumBadge';
 
 const SwipeCard = ({ user, onSwipe, style }) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
