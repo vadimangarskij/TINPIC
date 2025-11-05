@@ -166,7 +166,7 @@ def test_admin_settings_post(auth_headers):
     """Test POST /api/admin/settings"""
     print_header("Testing POST /api/admin/settings")
     
-    # Test setting a new setting
+    # Test setting a new setting - using query parameters as expected by the endpoint
     test_settings = [
         {"setting_key": "yoomoney_enabled", "setting_value": "true"},
         {"setting_key": "yoomoney_api_key", "setting_value": "test_api_key_123"},
@@ -179,7 +179,13 @@ def test_admin_settings_post(auth_headers):
     for setting in test_settings:
         print_info(f"Setting {setting['setting_key']} = {setting['setting_value']}")
         
-        response = make_request('POST', '/admin/settings', headers=auth_headers, data=setting)
+        # Use query parameters instead of JSON body
+        params = {
+            "setting_key": setting['setting_key'],
+            "setting_value": setting['setting_value']
+        }
+        
+        response = make_request('POST', '/admin/settings', headers=auth_headers, params=params)
         
         if response is None:
             print_error(f"POST /admin/settings - No response for {setting['setting_key']}")
