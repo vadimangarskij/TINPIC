@@ -546,14 +546,14 @@ const AdminPaymentSettingsPage = () => {
                               #{transaction.id}
                             </td>
                             <td className="px-6 py-4 text-gray-800 font-medium">
-                              {transaction.user}
+                              {transaction.user_name || 'Пользователь'}
                             </td>
                             <td className="px-6 py-4 text-gray-800 font-semibold">
                               {transaction.amount} ₽
                             </td>
                             <td className="px-6 py-4">
                               <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-                                {transaction.method}
+                                {transaction.payment_method}
                               </span>
                             </td>
                             <td className="px-6 py-4">
@@ -577,7 +577,7 @@ const AdminPaymentSettingsPage = () => {
                               )}
                             </td>
                             <td className="px-6 py-4 text-gray-600 text-sm">
-                              {transaction.date}
+                              {new Date(transaction.created_at).toLocaleString('ru-RU')}
                             </td>
                           </tr>
                         ))}
