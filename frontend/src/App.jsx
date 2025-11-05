@@ -198,6 +198,33 @@ function App() {
                   </div>
                 }
               />
+              
+              {/* Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <div className="h-full">
+                    <AdminDashboard />
+                  </div>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <div className="h-full">
+                    <AdminUsersPage />
+                  </div>
+                }
+              />
+              <Route
+                path="/admin/payments"
+                element={
+                  <div className="h-full">
+                    <AdminPaymentSettingsPage />
+                  </div>
+                }
+              />
+              
               <Route path="*" element={<Navigate to="/" replace />} />
             </>
           )}
