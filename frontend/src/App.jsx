@@ -198,6 +198,14 @@ function App() {
                   </div>
                 }
               />
+              <Route
+                path="/premium/customize"
+                element={
+                  <div className="h-full">
+                    <PremiumCustomizationPage />
+                  </div>
+                }
+              />
               
               {/* Admin Routes */}
               <Route
