@@ -4,6 +4,8 @@ import { useUserStore } from '../stores/userStore';
 import { MessageCircle, Heart, Clock, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import ProfileFrame from '../components/ProfileFrame';
+import PremiumBadge from '../components/PremiumBadge';
 
 const MatchesPage = () => {
   const navigate = useNavigate();
