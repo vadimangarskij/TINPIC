@@ -4,7 +4,26 @@
 
 Пользователь запросил создание ConnectSphere - современного PWA приложения для знакомств с AI-функциями, геолокацией, real-time чатом, премиум подпиской и интеграцией различных методов оплаты (YooMoney, QIWI, Telegram Stars).
 
-## Current Status - Phase 1: Fixed Critical Issues ✅
+## Current Status - Phase 1: Admin Payment Settings Page ✅
+
+### Latest Completed Task (Phase 1)
+
+✅ **Admin Payment Settings Page Created**
+- Created `/app/frontend/src/pages/AdminPaymentSettingsPage.jsx`
+- 3 tabs: Payment Gateways, Transactions, Global Settings
+- Payment gateway configuration for:
+  - YooMoney (API key, Shop ID, Secret key, Commission)
+  - QIWI (Wallet ID, Secret key, Commission)
+  - Telegram Stars (Bot token, Commission)
+- Transaction statistics dashboard
+- Recent transactions table
+- Global payment settings (min/max amounts, refunds, auto-verification)
+- Added routes in App.jsx for `/admin/payments`
+- Created backend endpoints:
+  - GET `/api/admin/transactions/stats`
+  - GET `/api/admin/transactions`
+- Created payment models in `/app/backend/models/payment.py`
+- Updated adminAPI in frontend utils
 
 ### Completed Tasks
 
