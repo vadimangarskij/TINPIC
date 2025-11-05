@@ -48,9 +48,9 @@ def make_request(method, endpoint, headers=None, data=None, params=None):
         if method.upper() == 'GET':
             response = requests.get(url, headers=headers, params=params, timeout=10)
         elif method.upper() == 'POST':
-            response = requests.post(url, headers=headers, json=data, timeout=10)
+            response = requests.post(url, headers=headers, json=data, params=params, timeout=10)
         elif method.upper() == 'PUT':
-            response = requests.put(url, headers=headers, json=data, timeout=10)
+            response = requests.put(url, headers=headers, json=data, params=params, timeout=10)
         else:
             raise ValueError(f"Unsupported method: {method}")
         
