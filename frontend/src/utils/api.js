@@ -97,6 +97,12 @@ export const adminAPI = {
   getSettings: () => api.get('/admin/settings'),
   updateSettings: (settingKey, settingValue) =>
     api.post('/admin/settings', { setting_key: settingKey, setting_value: settingValue }),
+  getTransactionStats: () => api.get('/admin/transactions/stats'),
+  getTransactions: (limit = 50, offset = 0, status = null) => {
+    let url = `/admin/transactions?limit=${limit}&offset=${offset}`;
+    if (status) url += `&status=${status}`;
+    return api.get(url);
+  },
 };
 
 export default api;
