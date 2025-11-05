@@ -113,18 +113,18 @@ const MatchesPage = () => {
                   className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
-                    {/* Avatar */}
+                    {/* Avatar with ProfileFrame */}
                     <div className="relative">
-                      <img
-                        src={match.matched_user?.photos?.[0] || '/placeholder-user.png'}
-                        alt={match.matched_user?.full_name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      {match.matched_user?.is_verified && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                      <ProfileFrame frameType={match.matched_user?.premium_frame || 'none'} size="sm">
+                        <img
+                          src={match.matched_user?.photos?.[0] || '/placeholder-user.png'}
+                          alt={match.matched_user?.full_name}
+                          className="w-16 h-16 object-cover"
+                        />
+                      </ProfileFrame>
+                      {match.matched_user?.is_premium && match.matched_user?.premium_badge && (
+                        <div className="absolute -top-1 -right-1 transform scale-75">
+                          <PremiumBadge type={match.matched_user.premium_badge} position="inline" animated={false} />
                         </div>
                       )}
                     </div>
