@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { Camera, Settings, Edit, MapPin, Briefcase, Heart, Star, Eye, Crown } from 'lucide-react';
+import { Camera, Settings, Edit, MapPin, Briefcase, Heart, Star, Eye, Crown, Sparkles } from 'lucide-react';
+import ProfileFrame from '../components/ProfileFrame';
+import PremiumBadge from '../components/PremiumBadge';
 import toast from 'react-hot-toast';
 
 const ProfilePage = () => {
