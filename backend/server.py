@@ -859,6 +859,62 @@ async def get_admin_settings(current_user_id: str = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/admin/transactions/stats")
+async def get_transaction_stats(current_user_id: str = Depends(get_current_user)):
+    """Get transaction statistics"""
+    try:
+        # TODO: Add actual transaction table queries when table is created
+        # For now, return mock data
+        today = datetime.now().date()
+        month_start = datetime.now().replace(day=1).date()
+        
+        # Mock data
+        stats = {
+            "total": 1523,
+            "today": 42,
+            "this_month": 678,
+            "revenue": 2450000,
+            "recent": []
+        }
+        
+        return stats
+    except Exception as e:
+        print(f"Transaction stats error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/admin/transactions")
+async def get_transactions(
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    status: Optional[str] = None,
+    current_user_id: str = Depends(get_current_user)
+):
+    """Get all transactions with filters"""
+    try:
+        # TODO: Implement when transactions table is created
+        # Mock data for now
+        transactions = [
+            {
+                "id": "1",
+                "user_id": "user1",
+                "user_name": "Анна И.",
+                "amount": 999,
+                "payment_method": "yoomoney",
+                "status": "completed",
+                "created_at": datetime.now().isoformat()
+            }
+        ]
+        
+        return {
+            "transactions": transactions,
+            "total": len(transactions),
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        print(f"Get transactions error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ============================================
 # RUN SERVER
 # ============================================
