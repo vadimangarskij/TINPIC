@@ -91,6 +91,11 @@ const SwipeCard = ({ user, onSwipe, style }) => {
                   </svg>
                 </div>
               )}
+              {user?.is_premium && user?.premium_badge && (
+                <div className="transform scale-90">
+                  <PremiumBadge type={user.premium_badge} position="inline" animated={true} />
+                </div>
+              )}
             </div>
 
             {/* Job & Location */}
